@@ -20,7 +20,7 @@ if (isset($_SESSION['user_id'])) {
         <section class="hero">
             <div class="hero-content">
                 <p class="eyebrow">Productividad gamificada</p>
-                <h1>QuestBoard</h1>
+                <h1>LifeQuest</h1>
                 <p class="hero-subtitle">Convierte tus metas en resultados.</p>
                 <p class="hero-text">
                     Un tablero personal para enfocarte, ejecutar y medir tu progreso mediante metas,

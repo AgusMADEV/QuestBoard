@@ -36,7 +36,7 @@ function statusLabelDashboard(string $status): string { return ['not_started'=>'
 </head>
 <body class="app-body">
     <aside class="sidebar">
-        <div class="sidebar-brand">QuestBoard</div>
+        <div class="sidebar-brand">LifeQuest</div>
         <nav class="sidebar-nav">
             <a href="dashboard.php" class="active">Inicio</a>
             <a href="areas.php">Áreas</a>

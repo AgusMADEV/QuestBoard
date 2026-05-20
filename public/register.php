@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <main class="auth-page">
         <section class="auth-card">
-            <a href="index.php" class="brand">QuestBoard</a>
+            <a href="index.php" class="brand">LifeQuest</a>
 
             <h1>Crear cuenta</h1>
             <p class="muted">Empieza a convertir tus metas en resultados.</p>

@@ -61,7 +61,7 @@ function statusLabel(string $status): string { return ['not_started'=>'No inicia
 </head>
 <body class="app-body">
     <aside class="sidebar">
-        <div class="sidebar-brand">QuestBoard</div>
+        <div class="sidebar-brand">LifeQuest</div>
         <nav class="sidebar-nav">
             <a href="dashboard.php" class="<?= activeNav('dashboard.php') ?>">Inicio</a>
             <a href="areas.php" class="<?= activeNav('areas.php') ?>">Áreas</a>

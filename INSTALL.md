@@ -1,4 +1,4 @@
-# Instrucciones de Instalación - QuestBoard
+# Instrucciones de Instalación - LifeQuest
 
 ## Requisitos Previos
 
@@ -13,7 +13,7 @@
 
 ```bash
 git clone <url-del-repositorio>
-cd QuestBoard
+cd LifeQuest
 ```
 
 ### 2. Configurar la base de datos
@@ -45,12 +45,12 @@ cd QuestBoard
 ### 4. Configurar el servidor web
 
 Para desarrollo local con XAMPP:
-- Coloca el proyecto en la carpeta `htdocs/QuestBoard`
-- Accede a `http://localhost/QuestBoard/public`
+- Coloca el proyecto en la carpeta `htdocs/LifeQuest`
+- Accede a `http://localhost/LifeQuest/public`
 
 ### 5. Verificar la instalación
 
-Visita `http://localhost/QuestBoard/public` en tu navegador para verificar que la aplicación funciona correctamente.
+Visita `http://localhost/LifeQuest/public` en tu navegador para verificar que la aplicación funciona correctamente.
 
 ## Problemas Comunes
 

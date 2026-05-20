@@ -1,11 +1,11 @@
-# QuestBoard  
+# LifeQuest  
 ## Documento completo de concepto y planificación del TFG
 
 ---
 
 ## 1. Nombre del proyecto
 
-# **QuestBoard**
+# **LifeQuest**
 
 ## Eslogan
 
@@ -21,7 +21,7 @@
 
 ## 2. Idea general
 
-**QuestBoard** es una aplicación web gamificada de productividad personal que permite organizar metas, hábitos, proyectos y tareas en un tablero centralizado.
+**LifeQuest** es una aplicación web gamificada de productividad personal que permite organizar metas, hábitos, proyectos y tareas en un tablero centralizado.
 
 La aplicación busca ayudar al usuario a convertir objetivos grandes en acciones diarias, medibles y conectadas entre sí.
 
@@ -35,7 +35,7 @@ La idea principal es:
 
 ## 3. Concepto resumido
 
-QuestBoard combina:
+LifeQuest combina:
 
 - gestión de metas
 - gestión de hábitos
@@ -55,7 +55,7 @@ El objetivo es que el usuario deje de tener sus metas repartidas entre varias ap
 
 ## 4. Descripción académica para el TFG
 
-> **QuestBoard es una aplicación web gamificada de productividad personal que permite gestionar metas, hábitos, proyectos y tareas mediante un dashboard centralizado. La aplicación incorpora mecánicas de gamificación como puntos, niveles, rachas, recompensas y un modo de concentración llamado Modo Batalla, con el objetivo de favorecer la organización, la constancia y la medición del progreso del usuario.**
+> **LifeQuest es una aplicación web gamificada de productividad personal que permite gestionar metas, hábitos, proyectos y tareas mediante un dashboard centralizado. La aplicación incorpora mecánicas de gamificación como puntos, niveles, rachas, recompensas y un modo de concentración llamado Modo Batalla, con el objetivo de favorecer la organización, la constancia y la medición del progreso del usuario.**
 
 Otra versión más formal:
 
@@ -79,13 +79,13 @@ Problemas habituales:
 - Falta de constancia.
 - No tener un sistema que obligue a revisar, ejecutar y medir.
 
-QuestBoard busca resolver estos problemas mediante un tablero único donde todo esté conectado.
+LifeQuest busca resolver estos problemas mediante un tablero único donde todo esté conectado.
 
 ---
 
 ## 6. Propuesta de valor
 
-QuestBoard ofrece:
+LifeQuest ofrece:
 
 - Un dashboard central con todo lo importante.
 - Metas conectadas a proyectos y tareas.
@@ -102,7 +102,7 @@ QuestBoard ofrece:
 
 ## 7. Público objetivo
 
-QuestBoard está pensado para personas que quieren mejorar su organización, disciplina y progreso personal.
+LifeQuest está pensado para personas que quieren mejorar su organización, disciplina y progreso personal.
 
 Usuarios ideales:
 
@@ -120,7 +120,7 @@ Usuarios ideales:
 
 ## 8. Diferencia respecto a una plantilla de Notion
 
-La inspiración visual puede venir de dashboards de productividad tipo Notion, pero QuestBoard debe ser una aplicación propia y dinámica.
+La inspiración visual puede venir de dashboards de productividad tipo Notion, pero LifeQuest debe ser una aplicación propia y dinámica.
 
 ### Una plantilla de Notion
 
@@ -133,7 +133,7 @@ La inspiración visual puede venir de dashboards de productividad tipo Notion, p
 - No tiene autenticación desarrollada por nosotros.
 - No tiene una base de datos relacional creada para el proyecto.
 
-### QuestBoard
+### LifeQuest
 
 - Tendrá usuarios reales.
 - Guardará datos en una base de datos MySQL.
@@ -152,7 +152,7 @@ La inspiración visual puede venir de dashboards de productividad tipo Notion, p
 
 ## 9. Estilo gráfico
 
-El estilo visual elegido para QuestBoard será:
+El estilo visual elegido para LifeQuest será:
 
 # **Minimalismo táctico gamificado**
 
@@ -266,7 +266,7 @@ El sistema permitirá que cada usuario tenga su propio espacio privado.
 
 # 11.2. Dashboard principal
 
-El dashboard será la pantalla central de QuestBoard.
+El dashboard será la pantalla central de LifeQuest.
 
 Debe ser limpio y mostrar solo lo importante.
 
@@ -395,7 +395,7 @@ Los proyectos permiten dividir una meta en bloques de trabajo.
 
 ```text
 Meta: Finalizar el TFG
-Proyecto: Desarrollo de QuestBoard
+Proyecto: Desarrollo de LifeQuest
 
 Tareas:
 - Crear base de datos
@@ -443,7 +443,7 @@ Las tareas son acciones concretas y ejecutables.
 
 ```text
 Tarea: Crear tabla users
-Proyecto: Desarrollo de QuestBoard
+Proyecto: Desarrollo de LifeQuest
 Prioridad: Alta
 Recompensa: +10 XP / +5 puntos
 ```
@@ -564,7 +564,7 @@ Nivel 10: 3000 XP
 
 # 11.10. Modo Batalla
 
-El Modo Batalla será la funcionalidad diferencial de QuestBoard.
+El Modo Batalla será la funcionalidad diferencial de LifeQuest.
 
 Consiste en una pantalla de concentración donde el usuario elige una tarea y trabaja en ella durante un tiempo determinado.
 
@@ -1398,7 +1398,7 @@ El proyecto estará documentado.
 
 ## Riesgo 1: Alcance demasiado grande
 
-QuestBoard tiene muchos módulos.
+LifeQuest tiene muchos módulos.
 
 ### Solución
 
@@ -1443,7 +1443,7 @@ Empezar con estadísticas básicas.
 En la defensa se puede seguir este recorrido:
 
 1. Explicar el problema.
-2. Presentar QuestBoard como solución.
+2. Presentar LifeQuest como solución.
 3. Mostrar landing.
 4. Registrar usuario.
 5. Iniciar sesión.
@@ -1467,7 +1467,7 @@ En la defensa se puede seguir este recorrido:
 
 ## 26. Frase final para la memoria
 
-> **QuestBoard propone una forma moderna y gamificada de gestionar el progreso personal. A través de un tablero centralizado, el usuario puede organizar metas, proyectos, hábitos y tareas, ejecutar sesiones de concentración mediante Modo Batalla y medir su avance con estadísticas, puntos, niveles y recompensas.**
+> **LifeQuest propone una forma moderna y gamificada de gestionar el progreso personal. A través de un tablero centralizado, el usuario puede organizar metas, proyectos, hábitos y tareas, ejecutar sesiones de concentración mediante Modo Batalla y medir su avance con estadísticas, puntos, niveles y recompensas.**
 
 ---
 

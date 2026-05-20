@@ -1,8 +1,8 @@
-CREATE DATABASE IF NOT EXISTS questboard
+CREATE DATABASE IF NOT EXISTS lifequest
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_unicode_ci;
 
-USE questboard;
+USE lifequest;
 
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,

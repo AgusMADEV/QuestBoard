@@ -72,7 +72,7 @@ function activeNav(string $page): string
 </head>
 <body class="app-body">
     <aside class="sidebar">
-        <div class="sidebar-brand">QuestBoard</div>
+        <div class="sidebar-brand">LifeQuest</div>
 
         <nav class="sidebar-nav">
             <a href="dashboard.php" class="<?= activeNav('dashboard.php') ?>">Inicio</a>

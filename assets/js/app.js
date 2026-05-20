@@ -1,1 +1,1 @@
-console.log('QuestBoard iniciado correctamente.');
+console.log('LifeQuest iniciado correctamente.');

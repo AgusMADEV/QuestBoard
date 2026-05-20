@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <main class="auth-page">
         <section class="auth-card">
-            <a href="index.php" class="brand">QuestBoard</a>
+            <a href="index.php" class="brand">LifeQuest</a>
 
             <h1>Iniciar sesión</h1>
             <p class="muted">Vuelve a tu tablero y sigue avanzando.</p>

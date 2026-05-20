@@ -1,4 +1,4 @@
-# LifeBoard / Videojuego de la Vida  
+# LifeQuest / Videojuego de la Vida  
 ## Documento base para iniciar el desarrollo del TFG
 
 ---
@@ -48,9 +48,9 @@ La idea central es:
 
 Nombres posibles:
 
-- **LifeBoard**
+- **LifeQuest**
 - **Videojuego de la Vida**
-- **QuestBoard**
+- **LifeQuest**
 - **DisciplineOS**
 - **ProgressOS**
 - **FocusBoard**
@@ -61,7 +61,7 @@ Nombres posibles:
 
 ### Nombre recomendado
 
-**LifeBoard**
+**LifeQuest**
 
 ### Subtítulo recomendado
 
@@ -77,7 +77,7 @@ Una posible descripción para la memoria del TFG sería:
 
 Otra versión más sencilla:
 
-> LifeBoard es una aplicación web de productividad personal que permite organizar áreas de vida, metas, proyectos, hábitos y tareas en un único tablero visual, incorporando mecánicas de gamificación para aumentar la motivación, medir el progreso y favorecer la constancia del usuario.
+> LifeQuest es una aplicación web de productividad personal que permite organizar áreas de vida, metas, proyectos, hábitos y tareas en un único tablero visual, incorporando mecánicas de gamificación para aumentar la motivación, medir el progreso y favorecer la constancia del usuario.
 
 ---
 
@@ -173,7 +173,7 @@ La aplicación busca resolver esto mediante un único tablero donde el usuario p
 
 ## 10. Propuesta de valor
 
-LifeBoard ofrece:
+LifeQuest ofrece:
 
 - Claridad en una sola vista.
 - Gestión de áreas de vida.
@@ -414,7 +414,7 @@ Ejemplo:
 
 ```text
 Proyecto:
-Desarrollo de LifeBoard.
+Desarrollo de LifeQuest.
 
 Tareas:
 - Crear diseño de base de datos.
@@ -1391,7 +1391,7 @@ Medidas mínimas necesarias:
 Antes de iniciar el desarrollo conviene cerrar estos puntos:
 
 1. **Nombre definitivo**  
-   Decidir entre LifeBoard, Videojuego de la Vida, QuestBoard, DisciplineOS u otro.
+   Decidir entre LifeQuest, Videojuego de la Vida, LifeQuest, DisciplineOS u otro.
 
 2. **Alcance del MVP**  
    Definir qué funcionalidades entran sí o sí y cuáles quedan como futuras mejoras.
@@ -1572,7 +1572,7 @@ En la defensa se puede mostrar este flujo:
 
 ## 32. Frase final para la memoria
 
-> LifeBoard propone una forma diferente de gestionar el progreso personal: convertir metas, hábitos, proyectos y tareas en un sistema visual, medible y gamificado. A través de un dashboard centralizado, el usuario puede priorizar, ejecutar y analizar su avance diario, incorporando mecánicas de puntos, rachas, recompensas y sesiones de concentración para transformar la planificación en resultados reales.
+> LifeQuest propone una forma diferente de gestionar el progreso personal: convertir metas, hábitos, proyectos y tareas en un sistema visual, medible y gamificado. A través de un dashboard centralizado, el usuario puede priorizar, ejecutar y analizar su avance diario, incorporando mecánicas de puntos, rachas, recompensas y sesiones de concentración para transformar la planificación en resultados reales.
 
 ---
 

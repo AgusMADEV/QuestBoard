@@ -4,6 +4,7 @@ require_once __DIR__ . '/../app/Controllers/AuthController.php';
 require_once __DIR__ . '/../app/Models/User.php';
 require_once __DIR__ . '/../app/Models/LifeArea.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
+require_once __DIR__ . '/../app/Models/Project.php';
 
 AuthController::requireAuth();
 
@@ -15,6 +16,8 @@ $lifeAreaModel = new LifeArea();
 $areas = array_slice($lifeAreaModel->getAllByUser((int)$user['id']), 0, 6);
 $goalModel = new Goal();
 $mainGoals = $goalModel->getMainByUser((int)$user['id'], 3);
+$projectModel = new Project();
+$activeProjects = $projectModel->getActiveByUser((int)$user['id'], 3);
 
 $xpCurrent = (int)$user['xp'];
 $xpNext = 100;
@@ -38,7 +41,7 @@ function statusLabelDashboard(string $status): string { return ['not_started'=>'
             <a href="dashboard.php" class="active">Inicio</a>
             <a href="areas.php">Áreas</a>
             <a href="goals.php">Metas</a>
-            <a href="#">Proyectos</a>
+            <a href="projects.php">Proyectos</a>
             <a href="#">Tareas</a>
             <a href="#">Hábitos</a>
             <a href="#">Stats</a>
@@ -92,6 +95,26 @@ function statusLabelDashboard(string $status): string { return ['not_started'=>'
                                 <strong><?= e($goal['title']) ?></strong>
                                 <div class="dashboard-goal-meta"><span><?= statusLabelDashboard($goal['status']) ?></span><span><?= (int)$goal['progress'] ?>%</span></div>
                                 <div class="progress"><div style="width: <?= (int)$goal['progress'] ?>%"></div></div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </article>
+
+            <article class="card large">
+                <div class="card-header"><h2>Proyectos activos</h2><a href="projects.php">Ver todos</a></div>
+                <?php if (empty($activeProjects)): ?>
+                    <div class="empty-state"><p>Aún no tienes proyectos activos.</p><a href="projects.php" class="btn btn-secondary">Crear proyecto</a></div>
+                <?php else: ?>
+                    <div class="dashboard-goals">
+                        <?php foreach ($activeProjects as $project): ?>
+                            <div class="dashboard-goal-item">
+                                <strong><?= e($project['title']) ?></strong>
+                                <div class="dashboard-goal-meta">
+                                    <span><?= !empty($project['goal_title']) ? '🎯 ' . e($project['goal_title']) : 'Sin meta' ?></span>
+                                    <span><?= (int)$project['progress'] ?>%</span>
+                                </div>
+                                <div class="progress"><div style="width: <?= (int)$project['progress'] ?>%"></div></div>
                             </div>
                         <?php endforeach; ?>
                     </div>

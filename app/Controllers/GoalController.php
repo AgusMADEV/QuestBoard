@@ -20,7 +20,7 @@ final class GoalController
 
     public function store(int $userId, array $data): array
     {
-        $clean = $this->validate($data);
+        $clean = $this->validate($userId, $data);
         if (!$clean['success']) return $clean;
         $ok = $this->goalModel->create($userId, $clean['data']);
         return ['success' => $ok, 'message' => $ok ? 'Meta creada correctamente.' : 'No se pudo crear la meta.'];
@@ -32,7 +32,7 @@ final class GoalController
         if ($id <= 0 || !$this->goalModel->findByIdAndUser($id, $userId)) {
             return ['success' => false, 'message' => 'Meta no válida.'];
         }
-        $clean = $this->validate($data);
+        $clean = $this->validate($userId, $data);
         if (!$clean['success']) return $clean;
         $ok = $this->goalModel->update($id, $userId, $clean['data']);
         return ['success' => $ok, 'message' => $ok ? 'Meta actualizada correctamente.' : 'No se pudo actualizar la meta.'];
@@ -47,11 +47,22 @@ final class GoalController
         return ['success' => $ok, 'message' => $ok ? 'Meta eliminada correctamente.' : 'No se pudo eliminar la meta.'];
     }
 
-    private function validate(array $data): array
+    private function validate(int $userId, array $data): array
     {
         $title = trim($data['title'] ?? '');
         if ($title === '') return ['success' => false, 'message' => 'El título de la meta es obligatorio.'];
         if (mb_strlen($title) > 150) return ['success' => false, 'message' => 'El título no puede superar los 150 caracteres.'];
+
+        $areaId = ((int)($data['area_id'] ?? 0)) > 0 ? (int)$data['area_id'] : null;
+        
+        // Validar que el área pertenece al usuario si se especificó
+        if ($areaId !== null) {
+            require_once __DIR__ . '/../Models/LifeArea.php';
+            $lifeAreaModel = new LifeArea();
+            if (!$lifeAreaModel->findByIdAndUser($areaId, $userId)) {
+                return ['success' => false, 'message' => 'El área seleccionada no existe o no pertenece a tu usuario.'];
+            }
+        }
 
         $allowedTypes = ['daily','weekly','monthly','quarterly','yearly','future'];
         $allowedPriorities = ['low','medium','high','critical'];
@@ -64,7 +75,7 @@ final class GoalController
         return [
             'success' => true,
             'data' => [
-                'area_id' => ((int)($data['area_id'] ?? 0)) > 0 ? (int)$data['area_id'] : null,
+                'area_id' => $areaId,
                 'title' => $title,
                 'description' => trim($data['description'] ?? '') ?: null,
                 'type' => $type,

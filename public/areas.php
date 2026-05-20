@@ -77,8 +77,8 @@ function activeNav(string $page): string
         <nav class="sidebar-nav">
             <a href="dashboard.php" class="<?= activeNav('dashboard.php') ?>">Inicio</a>
             <a href="areas.php" class="<?= activeNav('areas.php') ?>">Áreas</a>
-            <a href="#">Metas</a>
-            <a href="#">Proyectos</a>
+            <a href="goals.php" class="<?= activeNav('goals.php') ?>">Metas</a>
+            <a href="projects.php" class="<?= activeNav('projects.php') ?>">Proyectos</a>
             <a href="#">Tareas</a>
             <a href="#">Hábitos</a>
             <a href="#">Stats</a>

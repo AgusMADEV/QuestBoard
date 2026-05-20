@@ -113,6 +113,14 @@ final class LifeAreaController
             ];
         }
 
+        $goalsCount = $this->lifeAreaModel->countGoals($id, $userId);
+        if ($goalsCount > 0) {
+            return [
+                'success' => false,
+                'message' => "No se puede eliminar. Esta área tiene {$goalsCount} meta(s) asociada(s). Elimínalas o cámbiales de área primero."
+            ];
+        }
+
         $deleted = $this->lifeAreaModel->delete($id, $userId);
 
         return [

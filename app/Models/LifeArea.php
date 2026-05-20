@@ -93,4 +93,20 @@ final class LifeArea
             'user_id' => $userId,
         ]);
     }
+
+    public function countGoals(int $id, int $userId): int
+    {
+        $sql = "SELECT COUNT(*) as total
+                FROM goals
+                WHERE area_id = :area_id AND user_id = :user_id";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'area_id' => $id,
+            'user_id' => $userId,
+        ]);
+
+        $result = $stmt->fetch();
+        return (int) ($result['total'] ?? 0);
+    }
 }

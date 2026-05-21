@@ -50,8 +50,20 @@ final class GoalController
     private function validate(int $userId, array $data): array
     {
         $title = trim($data['title'] ?? '');
-        if ($title === '') return ['success' => false, 'message' => 'El título de la meta es obligatorio.'];
-        if (mb_strlen($title) > 150) return ['success' => false, 'message' => 'El título no puede superar los 150 caracteres.'];
+        if ($title === '') {
+            return [
+                'success' => false,
+                'message' => 'El título de la meta es obligatorio.',
+                'errors' => ['title' => 'El título es obligatorio.'],
+            ];
+        }
+        if (mb_strlen($title) > 150) {
+            return [
+                'success' => false,
+                'message' => 'El título no puede superar los 150 caracteres.',
+                'errors' => ['title' => 'Máximo 150 caracteres.'],
+            ];
+        }
 
         $areaId = ((int)($data['area_id'] ?? 0)) > 0 ? (int)$data['area_id'] : null;
         
@@ -60,7 +72,11 @@ final class GoalController
             require_once __DIR__ . '/../Models/LifeArea.php';
             $lifeAreaModel = new LifeArea();
             if (!$lifeAreaModel->findByIdAndUser($areaId, $userId)) {
-                return ['success' => false, 'message' => 'El área seleccionada no existe o no pertenece a tu usuario.'];
+                return [
+                    'success' => false,
+                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['area_id' => 'Área no válida para tu usuario.'],
+                ];
             }
         }
 

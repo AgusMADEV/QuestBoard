@@ -31,10 +31,12 @@ $taskModel = new Task();
 $todayTasks = $taskModel->getTodayByUser((int) $user['id'], 4);
 
 $xpCurrent = (int) $user['xp'];
-$xpNext = 2000;
-$xpPercent = min(100, (int) (($xpCurrent / max(1, $xpNext)) * 100));
-
 $level = max(1, (int) $user['level']);
+$xpPerLevel = 1000;
+$xpFloor = ($level - 1) * $xpPerLevel;
+$xpCurrentLevel = max(0, $xpCurrent - $xpFloor);
+$xpPercent = min(100, (int) (($xpCurrentLevel / max(1, $xpPerLevel)) * 100));
+$xpNext = $level * $xpPerLevel;
 $points = (int) $user['points'];
 $gems = max(0, intdiv($points, 20));
 $currentStreak = (int) $user['current_streak'];
@@ -76,6 +78,7 @@ function shortText(string|null $value, int $limit = 42): string
     <title>Inicio | <?= APP_NAME ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/modules/dashboard.css">
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
@@ -86,10 +89,8 @@ function shortText(string|null $value, int $limit = 42): string
         <nav class="lq-nav">
             <a href="dashboard.php" class="active"><span>🏠</span>Inicio</a>
             <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="projects.php"><span>🚀</span>Retos</a>
-            <a href="tasks.php"><span>✅</span>Misiones</a>
             <a href="areas.php"><span>🧩</span>Áreas</a>
-            <a href="#"><span>💚</span>Hábitos</a>
+            <a href="habits.php"><span>💚</span>Hábitos</a>
             <a href="#"><span>🛍️</span>Tienda</a>
             <a href="#"><span>📊</span>Progreso</a>
         </nav>
@@ -194,13 +195,13 @@ function shortText(string|null $value, int $limit = 42): string
                                 <strong><?= $level ?></strong>
                                 <span>Camino a nivel <?= $level + 1 ?></span>
                                 <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
-                                <em><?= number_format($xpCurrent, 0, ',', '.') ?> / <?= number_format($xpNext, 0, ',', '.') ?> XP</em>
+                                <em><?= number_format($xpCurrentLevel, 0, ',', '.') ?> / <?= number_format($xpPerLevel, 0, ',', '.') ?> XP</em>
                             </article>
 
                             <article>
                                 <small>XP actual</small>
                                 <strong><?= number_format($xpCurrent, 0, ',', '.') ?></strong>
-                                <span>+200 XP para subir</span>
+                                <span><?= number_format(max(0, $xpNext - $xpCurrent), 0, ',', '.') ?> XP para subir</span>
                                 <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
                             </article>
 
@@ -240,14 +241,14 @@ function shortText(string|null $value, int $limit = 42): string
                 <section class="lq-card missions-card">
                     <div class="lq-card-header">
                         <h2>Misiones de hoy <span><?= count($todayTasks) ?></span></h2>
-                        <a href="tasks.php">Ver todas</a>
+                        <a href="goals.php?section=tasks">Ver todas</a>
                     </div>
 
                     <?php if (empty($todayTasks)): ?>
                         <div class="friendly-empty">
                             <strong>No hay misiones para hoy todavía.</strong>
                             <p>Crea tareas concretas para avanzar en tus retos y metas.</p>
-                            <a href="tasks.php" class="mini-btn">Crear misión</a>
+                            <a href="goals.php?section=tasks" class="mini-btn">Crear misión</a>
                         </div>
                     <?php else: ?>
                         <div class="mission-list">

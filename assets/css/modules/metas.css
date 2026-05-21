@@ -1,0 +1,156 @@
+/* =========================================================
+   LifeQuest Metas Hub module
+   ========================================================= */
+
+.metas-shell {
+    display: grid;
+    gap: 16px;
+}
+
+.metas-hero {
+    margin-bottom: 0;
+}
+
+.metas-tabs {
+    display: inline-flex;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid var(--line);
+    box-shadow: var(--soft-shadow);
+    width: fit-content;
+}
+
+.metas-tabs a {
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-weight: 900;
+    color: #4a5a82;
+}
+
+.metas-tabs a.active {
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), #2acfa3);
+}
+
+.hub-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 18px;
+    align-items: start;
+}
+
+.metas-side-summary {
+    display: grid;
+    gap: 12px;
+    position: sticky;
+    top: 24px;
+}
+
+.metas-side-summary article {
+    background: rgba(255,255,255,.9);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 16px;
+    display: grid;
+    gap: 4px;
+}
+
+.metas-side-summary small {
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.metas-side-summary strong {
+    font-size: 1.6rem;
+    letter-spacing: -.05em;
+}
+
+.metas-side-summary span {
+    color: #4e5f86;
+    font-size: .88rem;
+}
+
+.mission-list-like {
+    gap: 12px;
+}
+
+.mission-row-card {
+    background: rgba(255,255,255,.95);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 14px;
+    display: grid;
+    gap: 12px;
+}
+
+.mission-row-main {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.3fr) minmax(120px, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+}
+
+.mission-row-title {
+    display: grid;
+    gap: 4px;
+}
+
+.mission-row-title small {
+    color: var(--muted);
+}
+
+.mission-row-progress {
+    min-width: 140px;
+}
+
+.mission-row-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.mission-row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+@media (max-width: 1280px) {
+    .hub-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .metas-side-summary {
+        position: static;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .metas-tabs {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .metas-tabs a {
+        text-align: center;
+    }
+
+    .mission-row-main {
+        grid-template-columns: 1fr;
+    }
+
+    .mission-row-meta,
+    .mission-row-actions {
+        justify-content: flex-start;
+    }
+
+    .metas-side-summary {
+        grid-template-columns: 1fr;
+    }
+}

@@ -129,7 +129,7 @@ final class TaskController
             if (!$goalModel->findByIdAndUser($goalId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'El meta seleccionado no existe o no pertenece a tu usuario.'
+                    'message' => 'La meta seleccionada no existe o no pertenece a tu usuario.'
                 ];
             }
         }

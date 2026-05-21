@@ -14,6 +14,12 @@ $userModel = new User();
 $userId = (int) $_SESSION['user_id'];
 $user = $userModel->findById($userId);
 
+if (!$user) {
+    AuthController::logout();
+    header('Location: login.php');
+    exit;
+}
+
 $message = null;
 $messageType = null;
 $editingArea = null;
@@ -69,6 +75,7 @@ function shortText(string|null $value, int $limit = 42): string
     <title>Áreas | <?= APP_NAME ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/modules/crud.css">
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
@@ -76,10 +83,8 @@ function shortText(string|null $value, int $limit = 42): string
         <nav class="lq-nav">
             <a href="dashboard.php"><span>🏠</span>Inicio</a>
             <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="projects.php"><span>🚀</span>Retos</a>
-            <a href="tasks.php"><span>✅</span>Misiones</a>
             <a href="areas.php" class="active"><span>🧩</span>Áreas</a>
-            <a href="#"><span>💚</span>Hábitos</a>
+            <a href="habits.php"><span>💚</span>Hábitos</a>
             <a href="#"><span>🛍️</span>Tienda</a>
             <a href="#"><span>📊</span>Progreso</a>
         </nav>

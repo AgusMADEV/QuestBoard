@@ -7,14 +7,15 @@ Este paquete adapta las ventanas internas al nuevo estilo visual tipo app gamifi
 - `public/areas.php`
 - `public/goals.php`
 - `public/projects.php`
+- `public/tasks.php`
 - `assets/css/styles.css`
 
 ## Cambios
 
-- Áreas, Objetivos y Misiones usan ahora la misma sidebar de LifeQuest.
+- Áreas, Metas, Retos y Misiones usan ahora la misma sidebar de LifeQuest.
 - Topbar con buscador, XP, LifeCoins y perfil.
 - Formularios y listados adaptados a tarjetas modernas.
-- "Proyectos" pasa a mostrarse visualmente como "Misiones".
+- Nomenclatura consistente: Metas (`goals`), Retos (`projects`), Misiones (`tasks`).
 - Se mantiene la lógica PHP y la base de datos actual.
 
 ## Instalación
@@ -27,4 +28,5 @@ Este paquete adapta las ventanas internas al nuevo estilo visual tipo app gamifi
 http://localhost/LifeQuest/public/areas.php
 http://localhost/LifeQuest/public/goals.php
 http://localhost/LifeQuest/public/projects.php
+http://localhost/LifeQuest/public/tasks.php
 ```

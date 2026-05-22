@@ -192,18 +192,19 @@ a {
 
 .lq-nav {
     display: grid;
-    gap: 8px;
+    gap: 12px;
 }
 
 .lq-nav a {
     display: flex;
-    gap: 14px;
+    gap: 12px;
     align-items: center;
-    padding: 15px 18px;
-    border-radius: 16px;
-    color: #3f4c75;
-    font-weight: 800;
-    transition: .18s ease;
+    min-height: 52px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    color: #4e5f8a;
+    font-weight: 700;
+    transition: .2s ease;
 }
 
 .lq-nav a span {
@@ -211,11 +212,57 @@ a {
     text-align: center;
 }
 
-.lq-nav a:hover,
+.lq-nav .nav-icon {
+    width: 24px;
+    height: 24px;
+    display: grid;
+    place-items: center;
+}
+
+.lq-nav .nav-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.lq-nav .icon-outline {
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.65;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: .9;
+}
+
+.lq-nav .nav-icon .icon-solid {
+    display: none;
+    fill: currentColor;
+}
+
+.lq-nav a.active .nav-icon svg {
+    transform: translateY(.3px);
+}
+
+.lq-nav a.active .icon-outline {
+    display: none;
+}
+
+.lq-nav a.active .nav-icon .icon-solid {
+    display: block;
+}
+
+.lq-nav a:not(.active) .nav-icon .icon-solid {
+    display: none;
+}
+
+.lq-nav a:hover {
+    color: #3f4f78;
+}
+
 .lq-nav a.active {
-    background: linear-gradient(135deg, rgba(22,199,154,.14), rgba(22,199,154,.05));
-    color: #07966f;
-    box-shadow: inset 0 0 0 1px rgba(22,199,154,.32);
+    background: linear-gradient(135deg, rgba(22,199,154,.16), rgba(22,199,154,.06));
+    color: #0ca678;
+    box-shadow: inset 0 0 0 1px rgba(22,199,154,.4);
 }
 
 .lq-sidebar-card,
@@ -287,6 +334,63 @@ a {
 .week-mini .done {
     background: var(--primary);
     color: #fff;
+}
+
+.week-stack {
+    gap: 7px;
+    align-items: flex-start;
+}
+
+.week-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    min-width: 19px;
+}
+
+.week-stack .week-dot {
+    width: 19px;
+    height: 19px;
+    border-radius: 50%;
+    border: 1.5px solid #d8e0ee;
+    background: #fdfefe;
+    color: transparent;
+    display: grid;
+    place-items: center;
+    font-size: .67rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 1px 0 rgba(16, 25, 53, .03);
+}
+
+.week-stack .week-dot.done {
+    background: #13c38c;
+    border-color: #13c38c;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(19, 195, 140, .22);
+}
+
+.week-stack .week-label {
+    margin: 0;
+    font-size: .64rem;
+    font-weight: 900;
+    color: #8f98ae;
+    letter-spacing: .03em;
+    line-height: 1;
+}
+
+.week-dots.week-stack {
+    gap: 9px;
+}
+
+.week-mini.week-stack {
+    gap: 6px;
+}
+
+.streak-row .week-stack {
+    margin-top: 0;
+    margin-left: auto;
 }
 
 .unlock {

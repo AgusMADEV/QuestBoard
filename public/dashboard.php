@@ -6,6 +6,7 @@ require_once __DIR__ . '/../app/Models/LifeArea.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
 require_once __DIR__ . '/../app/Models/Project.php';
 require_once __DIR__ . '/../app/Models/Task.php';
+require_once __DIR__ . '/../app/Support/StreakWeek.php';
 
 AuthController::requireAuth();
 
@@ -29,6 +30,7 @@ $activeProjects = $projectModel->getActiveByUser((int) $user['id'], 4);
 
 $taskModel = new Task();
 $todayTasks = $taskModel->getTodayByUser((int) $user['id'], 4);
+$weekActivity = buildWeeklyActivityByUser((int) $user['id']);
 
 $xpCurrent = (int) $user['xp'];
 $level = max(1, (int) $user['level']);
@@ -82,32 +84,21 @@ function shortText(string|null $value, int $limit = 42): string
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
-        <a href="dashboard.php" class="lq-logo">
-            <span>Life<span>Quest</span><i>✦</i></span>
-        </a>
-
-        <nav class="lq-nav">
-            <a href="dashboard.php" class="active"><span>🏠</span>Inicio</a>
-            <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="areas.php"><span>🧩</span>Áreas</a>
-            <a href="habits.php"><span>💚</span>Hábitos</a>
-            <a href="#"><span>🛍️</span>Tienda</a>
-            <a href="#"><span>📊</span>Progreso</a>
-        </nav>
+        <?php $activeNav = 'dashboard'; ?>
+        <?php require __DIR__ . '/partials/sidebar_nav.php'; ?>
 
         <section class="lq-sidebar-card streak">
             <div class="streak-icon">🔥</div>
             <p>Racha actual</p>
             <strong><?= $currentStreak ?> días</strong>
             <small>¡Sigue así!</small>
-            <div class="week-dots">
-                <span class="done">L</span>
-                <span class="done">M</span>
-                <span class="done">X</span>
-                <span class="done">J</span>
-                <span class="done">V</span>
-                <span>S</span>
-                <span>D</span>
+            <div class="week-dots week-stack">
+                <?php foreach ($weekActivity as $day): ?>
+                    <div class="week-day" title="<?= e($day['date']) ?>">
+                        <span class="week-dot <?= $day['done'] ? 'done' : '' ?>"><?= $day['done'] ? '✓' : '' ?></span>
+                        <small class="week-label"><?= $day['label'] ?></small>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </section>
 
@@ -120,20 +111,8 @@ function shortText(string|null $value, int $limit = 42): string
             <span class="bag">🎒</span>
         </section>
 
-        <section class="lq-user-mini">
-            <div class="mini-avatar"><?= mb_strtoupper(mb_substr($user['name'], 0, 1)) ?></div>
-            <div>
-                <strong><?= e(shortText($user['name'], 18)) ?></strong>
-                <small>Ver perfil</small>
-            </div>
-            <span>⌄</span>
-        </section>
-
-        <div class="lq-sidebar-bottom">
-            <a href="#">⚙️</a>
-            <a href="#">?</a>
-            <a href="logout.php">↪</a>
-        </div>
+        <?php require __DIR__ . '/partials/sidebar_user_mini.php'; ?>
+        <?php require __DIR__ . '/partials/sidebar_bottom.php'; ?>
     </aside>
 
     <main class="lq-main">
@@ -141,7 +120,12 @@ function shortText(string|null $value, int $limit = 42): string
             <button class="icon-btn">☰</button>
 
             <div class="search-box">
-                <span>🔎</span>
+                <span>
+                    <svg id="Search" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="11.2481" cy="10.7887" r="8.03854" stroke="#7b86a3" stroke-width="1.5" stroke-linecap="square"></circle>
+                        <path d="M16.7369 16.7083L21.2904 21.2499" stroke="#7b86a3" stroke-width="1.5" stroke-linecap="square"></path>
+                    </svg>
+                </span>
                 <input type="search" placeholder="Buscar misiones, hábitos o recompensas..." disabled>
                 <kbd>⌘ K</kbd>
             </div>
@@ -225,8 +209,13 @@ function shortText(string|null $value, int $limit = 42): string
                                     <small>Racha actual</small>
                                     <strong><?= $currentStreak ?> días</strong>
                                 </div>
-                                <div class="week-mini">
-                                    <i class="done">L</i><i class="done">M</i><i class="done">X</i><i class="done">J</i><i class="done">V</i><i>S</i><i>D</i>
+                                <div class="week-mini week-stack">
+                                    <?php foreach ($weekActivity as $day): ?>
+                                        <div class="week-day" title="<?= e($day['date']) ?>">
+                                            <span class="week-dot <?= $day['done'] ? 'done' : '' ?>"><?= $day['done'] ? '✓' : '' ?></span>
+                                            <small class="week-label"><?= $day['label'] ?></small>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 

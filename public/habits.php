@@ -5,6 +5,7 @@ require_once __DIR__ . '/../app/Controllers/HabitController.php';
 require_once __DIR__ . '/../app/Models/LifeArea.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
 require_once __DIR__ . '/../app/Models/User.php';
+require_once __DIR__ . '/../app/Support/StreakWeek.php';
 
 AuthController::requireAuth();
 
@@ -98,6 +99,9 @@ for ($i = 0; $i < 7; $i++) {
 
 $weekLabels = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
 $weekLogs = $habitController->weekLogs($userId, $weekStart, $weekEnd);
+$weekActivity = buildWeeklyActivityByUser($userId, new DateTimeImmutable($weekStart));
+
+$currentStreak = (int) ($user['current_streak'] ?? 0);
 $completedPeriod = 0;
 $possiblePeriod = max(1, count($habits) * max(1, count($periodDates)));
 $fullPeriodHabits = 0;
@@ -218,24 +222,20 @@ function habitEmojiByIndex(int $index): string
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
-        <a href="dashboard.php" class="lq-logo"><span>Life<span>Quest</span><i>✦</i></span></a>
-        <nav class="lq-nav">
-            <a href="dashboard.php"><span>🏠</span>Inicio</a>
-            <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="areas.php"><span>🧩</span>Áreas</a>
-            <a href="habits.php" class="active"><span>💚</span>Hábitos</a>
-            <a href="#"><span>🛍️</span>Tienda</a>
-            <a href="#"><span>📊</span>Progreso</a>
-        </nav>
+        <?php $activeNav = 'habits'; ?>
+        <?php require __DIR__ . '/partials/sidebar_nav.php'; ?>
 
         <section class="lq-sidebar-card streak">
             <div class="streak-icon">🔥</div>
             <p>Racha actual</p>
-            <strong><?= (int) ($stats['best_streak'] ?? 0) ?> días</strong>
+            <strong><?= $currentStreak ?> días</strong>
             <small>¡Sigue así!</small>
-            <div class="week-dots">
-                <?php foreach ($weekLabels as $idx => $label): ?>
-                    <span class="<?= ($idx + 1) <= $todayIndex ? 'done' : '' ?>"><?= $label ?></span>
+            <div class="week-dots week-stack">
+                <?php foreach ($weekActivity as $day): ?>
+                    <div class="week-day" title="<?= e($day['date']) ?>">
+                        <span class="week-dot <?= $day['done'] ? 'done' : '' ?>"><?= $day['done'] ? '✓' : '' ?></span>
+                        <small class="week-label"><?= $day['label'] ?></small>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </section>
@@ -255,20 +255,9 @@ function habitEmojiByIndex(int $index): string
             <div class="lq-progress"><span style="width: <?= $xpPercent ?>%"></span></div>
         </section>
 
-        <section class="lq-user-mini">
-            <div class="mini-avatar"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-            <div>
-                <strong><?= e(shortText($user['name'] ?? 'Usuario', 18)) ?></strong>
-                <small>Nivel <?= (int) ($user['level'] ?? 1) ?></small>
-            </div>
-            <span>⌄</span>
-        </section>
-
-        <div class="lq-sidebar-bottom">
-            <a href="#">⚙️</a>
-            <a href="#">?</a>
-            <a href="logout.php">↪</a>
-        </div>
+        <?php $sidebarUserSubtitle = 'Nivel ' . (int) ($user['level'] ?? 1); ?>
+        <?php require __DIR__ . '/partials/sidebar_user_mini.php'; ?>
+        <?php require __DIR__ . '/partials/sidebar_bottom.php'; ?>
     </aside>
 
     <main class="lq-main">

@@ -79,15 +79,8 @@ function shortText(string|null $value, int $limit = 42): string
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
-        <a href="dashboard.php" class="lq-logo"><span>Life<span>Quest</span><i>✦</i></span></a>
-        <nav class="lq-nav">
-            <a href="dashboard.php"><span>🏠</span>Inicio</a>
-            <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="areas.php" class="active"><span>🧩</span>Áreas</a>
-            <a href="habits.php"><span>💚</span>Hábitos</a>
-            <a href="#"><span>🛍️</span>Tienda</a>
-            <a href="#"><span>📊</span>Progreso</a>
-        </nav>
+        <?php $activeNav = 'areas'; ?>
+        <?php require __DIR__ . '/partials/sidebar_nav.php'; ?>
 
         <section class="lq-sidebar-card streak">
             <div class="streak-icon">🔥</div>
@@ -96,20 +89,8 @@ function shortText(string|null $value, int $limit = 42): string
             <small>¡Sigue así!</small>
         </section>
 
-        <section class="lq-user-mini">
-            <div class="mini-avatar"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-            <div>
-                <strong><?= e(shortText($user['name'] ?? 'Usuario', 18)) ?></strong>
-                <small>Ver perfil</small>
-            </div>
-            <span>⌄</span>
-        </section>
-
-        <div class="lq-sidebar-bottom">
-            <a href="#">⚙️</a>
-            <a href="#">?</a>
-            <a href="logout.php">↪</a>
-        </div>
+        <?php require __DIR__ . '/partials/sidebar_user_mini.php'; ?>
+        <?php require __DIR__ . '/partials/sidebar_bottom.php'; ?>
     </aside>
 
     <main class="lq-main">

@@ -77,6 +77,34 @@ final class Task
         return $stmt->fetchAll();
     }
 
+    public function getCompletedDatesByRange(int $userId, string $startDate, string $endDate): array
+    {
+        $sql = "SELECT DISTINCT DATE(COALESCE(completed_at, created_at)) AS completed_date
+                FROM tasks
+                WHERE user_id = :user_id
+                  AND status = 'completed'
+                  AND DATE(COALESCE(completed_at, created_at)) BETWEEN :start_date AND :end_date";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'user_id' => $userId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+
+        $dates = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $date = (string) ($row['completed_date'] ?? '');
+
+            if ($date !== '') {
+                $dates[$date] = true;
+            }
+        }
+
+        return $dates;
+    }
+
     public function findByIdAndUser(int $id, int $userId): ?array
     {
         $sql = "SELECT *

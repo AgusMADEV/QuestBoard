@@ -38,7 +38,20 @@ final class User
 
     public function findById(int $id): ?array
     {
-        $sql = "SELECT id, name, email, avatar, level, xp, points, current_streak, created_at
+                $sql = "SELECT id,
+                                             name,
+                                             email,
+                                             avatar,
+                                             level,
+                                             xp,
+                                             points,
+                                             COALESCE((
+                                                     SELECT MAX(h.current_streak)
+                                                     FROM habits h
+                                                     WHERE h.user_id = users.id
+                                                         AND h.active = 1
+                                             ), users.current_streak, 0) AS current_streak,
+                                             created_at
                 FROM users
                 WHERE id = :id
                 LIMIT 1";

@@ -176,6 +176,7 @@ final class Habit
             }
 
             $this->recalculateStreaks($habitId, $userId);
+            $this->syncUserCurrentStreak($userId);
             $this->db->commit();
 
             return ['success' => true, 'message' => $message];
@@ -300,6 +301,30 @@ final class Habit
             'current_streak' => $currentStreak,
             'best_streak' => $bestStreak,
             'habit_id' => $habitId,
+            'user_id' => $userId,
+        ]);
+    }
+
+    private function syncUserCurrentStreak(int $userId): void
+    {
+        $stmt = $this->db->prepare(
+            "SELECT COALESCE(MAX(current_streak), 0) AS current_streak
+             FROM habits
+             WHERE user_id = :user_id
+               AND active = 1"
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        $globalStreak = (int) (($stmt->fetch()['current_streak'] ?? 0));
+
+        $update = $this->db->prepare(
+            "UPDATE users
+             SET current_streak = :current_streak
+             WHERE id = :user_id"
+        );
+
+        $update->execute([
+            'current_streak' => $globalStreak,
             'user_id' => $userId,
         ]);
     }

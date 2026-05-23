@@ -38,6 +38,11 @@ define('REWARD_GOAL_BASE_XP_FUTURE', 110);
 // Balance de tienda (indulgencias)
 define('INDULGENCE_REPEAT_COST_MULTIPLIER', 1.25);
 
+// Portal admin separado (fuera del flujo principal de la app)
+define('ADMIN_PORTAL_ENABLED', true);
+define('ADMIN_PORTAL_SESSION_TIMEOUT_SECONDS', 900);
+define('ADMIN_PORTAL_PASSWORD_MIN_LENGTH', 12);
+
 // Configuración de sesiones
 define('SESSION_NAME', 'lifequest_session');
 

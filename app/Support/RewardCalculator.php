@@ -2,8 +2,12 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/../Models/AppSettings.php';
+
 final class RewardCalculator
 {
+    private static ?array $settingsCache = null;
+
     public static function forHabit(string $frequency, bool $isNegative): array
     {
         if ($isNegative) {
@@ -102,11 +106,45 @@ final class RewardCalculator
 
     private static function constInt(string $name, int $fallback): int
     {
+        $settings = self::settings();
+
+        if (isset($settings[$name]) && is_numeric($settings[$name])) {
+            return (int) round((float) $settings[$name]);
+        }
+
         return defined($name) ? (int) constant($name) : $fallback;
     }
 
     private static function constFloat(string $name, float $fallback): float
     {
+        $settings = self::settings();
+
+        if (isset($settings[$name]) && is_numeric($settings[$name])) {
+            return (float) $settings[$name];
+        }
+
         return defined($name) ? (float) constant($name) : $fallback;
+    }
+
+    private static function settings(): array
+    {
+        if (self::$settingsCache !== null) {
+            return self::$settingsCache;
+        }
+
+        $model = new AppSettings();
+        self::$settingsCache = $model->getMany([
+            'REWARD_POINTS_PER_XP',
+            'REWARD_HABIT_BASE_XP',
+            'REWARD_TASK_BASE_XP',
+            'REWARD_GOAL_BASE_XP_DAILY',
+            'REWARD_GOAL_BASE_XP_WEEKLY',
+            'REWARD_GOAL_BASE_XP_MONTHLY',
+            'REWARD_GOAL_BASE_XP_QUARTERLY',
+            'REWARD_GOAL_BASE_XP_YEARLY',
+            'REWARD_GOAL_BASE_XP_FUTURE',
+        ]);
+
+        return self::$settingsCache;
     }
 }

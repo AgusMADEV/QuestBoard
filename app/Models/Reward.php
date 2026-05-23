@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Database/connection.php';
+require_once __DIR__ . '/AppSettings.php';
 
 final class Reward
 {
     private PDO $db;
     private array $columnCache = [];
+    private ?array $settingsCache = null;
 
     public function __construct()
     {
@@ -171,14 +173,15 @@ final class Reward
 
         $stmt->execute($params);
 
-        $multiplier = defined('INDULGENCE_REPEAT_COST_MULTIPLIER') ? (float) INDULGENCE_REPEAT_COST_MULTIPLIER : 1.25;
+        $multiplier = $this->getFloatSetting('INDULGENCE_REPEAT_COST_MULTIPLIER', defined('INDULGENCE_REPEAT_COST_MULTIPLIER') ? (float) INDULGENCE_REPEAT_COST_MULTIPLIER : 1.25);
+        $cosmeticMultiplier = $this->getFloatSetting('COSMETIC_PRICE_MULTIPLIER', 1.0);
 
-        return array_map(static function (array $row) use ($shopType, $multiplier): array {
+        return array_map(static function (array $row) use ($shopType, $multiplier, $cosmeticMultiplier): array {
             $baseCost = max(0, (int) ($row['cost_points'] ?? 0));
             $weeklyUsed = max(0, (int) ($row['weekly_used'] ?? 0));
             $dynamicCost = $shopType === 'indulgence'
                 ? (int) ceil($baseCost * pow(max(1.0, $multiplier), $weeklyUsed))
-                : $baseCost;
+            : (int) ceil($baseCost * max(0.1, $cosmeticMultiplier));
 
             return [
                 'id' => (int) $row['id'],
@@ -262,7 +265,7 @@ final class Reward
         }
 
         $baseCost = max(0, (int) ($reward['cost_points'] ?? 0));
-        $multiplier = defined('INDULGENCE_REPEAT_COST_MULTIPLIER') ? (float) INDULGENCE_REPEAT_COST_MULTIPLIER : 1.25;
+        $multiplier = $this->getFloatSetting('INDULGENCE_REPEAT_COST_MULTIPLIER', defined('INDULGENCE_REPEAT_COST_MULTIPLIER') ? (float) INDULGENCE_REPEAT_COST_MULTIPLIER : 1.25);
         $cost = (int) ceil($baseCost * pow(max(1.0, $multiplier), $weeklyUsed));
         $points = max(0, (int) ($user['points'] ?? 0));
 
@@ -366,7 +369,8 @@ final class Reward
             return ['success' => false, 'message' => 'Usuario no encontrado.'];
         }
 
-        $cost = max(0, (int) ($reward['cost_points'] ?? 0));
+        $cosmeticMultiplier = $this->getFloatSetting('COSMETIC_PRICE_MULTIPLIER', 1.0);
+        $cost = (int) ceil(max(0, (int) ($reward['cost_points'] ?? 0)) * max(0.1, $cosmeticMultiplier));
         $points = max(0, (int) ($user['points'] ?? 0));
 
         if ($points < $cost) {
@@ -430,5 +434,31 @@ final class Reward
         $this->columnCache[$cacheKey] = $exists;
 
         return $exists;
+    }
+
+    private function getFloatSetting(string $key, float $fallback): float
+    {
+        $settings = $this->settings();
+
+        if (isset($settings[$key]) && is_numeric($settings[$key])) {
+            return (float) $settings[$key];
+        }
+
+        return $fallback;
+    }
+
+    private function settings(): array
+    {
+        if ($this->settingsCache !== null) {
+            return $this->settingsCache;
+        }
+
+        $model = new AppSettings($this->db);
+        $this->settingsCache = $model->getMany([
+            'INDULGENCE_REPEAT_COST_MULTIPLIER',
+            'COSMETIC_PRICE_MULTIPLIER',
+        ]);
+
+        return $this->settingsCache;
     }
 }

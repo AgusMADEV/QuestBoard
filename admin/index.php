@@ -25,7 +25,7 @@ if (!empty($_SESSION['admin_portal_user_id'])) {
     }
 
     $_SESSION['admin_portal_logged_at'] = time();
-    header('Location: dashboard.php');
+    header('Location: database.php?section=db');
     exit;
 }
 

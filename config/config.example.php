@@ -42,6 +42,9 @@ define('INDULGENCE_REPEAT_COST_MULTIPLIER', 1.25);
 define('ADMIN_PORTAL_ENABLED', true);
 define('ADMIN_PORTAL_SESSION_TIMEOUT_SECONDS', 900);
 define('ADMIN_PORTAL_PASSWORD_MIN_LENGTH', 12);
+define('ADMIN_DB_ALLOW_WRITE_QUERIES', true);
+define('ADMIN_DB_ALLOW_SCHEMA_QUERIES', false);
+define('ADMIN_DB_MAX_ROWS', 200);
 
 // Configuración de sesiones
 define('SESSION_NAME', 'lifequest_session');

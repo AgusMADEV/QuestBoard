@@ -95,16 +95,9 @@ function shortText(string|null $value, int $limit = 42): string
     </aside>
 
     <main class="lq-main shop-main">
-        <header class="lq-topbar shop-topbar">
-            <div>
-                <h1>Tienda</h1>
-                <p>Indulgencias y cosméticos en un solo lugar, con economía balanceada.</p>
-            </div>
-            <div class="shop-top-stats">
-                <div class="currency-pill coin"><span>🪙</span><strong><?= number_format($points, 0, ',', '.') ?></strong></div>
-                <div class="currency-pill hp"><span>❤️</span><strong><?= number_format($hp, 0, ',', '.') ?>/<?= number_format($maxHp, 0, ',', '.') ?></strong></div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar indulgencias o cosméticos...'; ?>
+        <?php $topbarShowHp = true; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <?php if ($message): ?>
             <div class="lq-alert <?= e($messageType) ?>"><?= e($message) ?></div>

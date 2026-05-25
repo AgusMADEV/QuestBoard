@@ -490,22 +490,8 @@ function formatAxisXp(int $value): string
     </aside>
 
     <main class="lq-main">
-        <header class="lq-topbar">
-            <button class="icon-btn">☰</button>
-            <div class="search-box">
-                <span>🔎</span>
-                <input type="search" placeholder="Buscar metricas o logros..." disabled>
-                <kbd>⌘ K</kbd>
-            </div>
-            <div class="top-stats">
-                <div class="currency-pill coin"><span>🪙</span><strong><?= number_format($points, 0, ',', '.') ?></strong></div>
-                <div class="currency-pill gem"><span>💎</span><strong><?= $gems ?></strong></div>
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-                    <strong>Hola, <?= e(shortText($user['name'] ?? 'Usuario', 12)) ?>!</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar métricas o logros...'; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <section class="progress-shell">
             <header class="progress-head">

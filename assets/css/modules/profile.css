@@ -21,16 +21,6 @@
     border-radius: 14px;
 }
 
-.notify-pill {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,.9);
-    box-shadow: var(--soft-shadow);
-    cursor: pointer;
-}
-
 .profile-shell {
     display: grid;
     gap: 16px;
@@ -72,10 +62,27 @@
     letter-spacing: -.02em;
 }
 
+.badges-counter {
+    margin-left: 8px;
+    color: #6d7ca4;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
 .card-head-row a {
     color: #5c6c96;
     font-weight: 700;
     font-size: .84rem;
+}
+
+.link-like-btn {
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #5c6c96;
+    font-weight: 700;
+    font-size: .84rem;
+    cursor: pointer;
 }
 
 .identity-main {
@@ -310,6 +317,14 @@
     padding: 8px 2px;
 }
 
+.badge-item.unlocked {
+    opacity: 1;
+}
+
+.badge-item.locked {
+    opacity: .82;
+}
+
 .badge-item strong {
     font-size: .92rem;
 }
@@ -328,6 +343,121 @@
     font-size: 2rem;
     border: 1px solid #e3e9f5;
     box-shadow: 0 10px 18px rgba(80,98,140,.1);
+}
+
+.badge-item.locked .badge-medal {
+    filter: grayscale(1);
+    border-color: #d8deec;
+    box-shadow: 0 8px 14px rgba(80, 98, 140, .08);
+}
+
+.badge-progress {
+    width: 72px;
+    height: 6px;
+    border-radius: 999px;
+    background: #e8edf8;
+    overflow: hidden;
+}
+
+.badge-progress i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #6f88ff, #66d1be);
+}
+
+.profile-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 120;
+    background: rgba(10, 18, 37, .48);
+    display: none;
+    place-items: center;
+    padding: 20px;
+}
+
+.profile-modal-overlay.is-open {
+    display: grid;
+}
+
+.profile-modal-card {
+    width: min(980px, 100%);
+    max-height: min(86vh, 900px);
+    overflow: auto;
+    border-radius: 20px;
+    background: #fdfefe;
+    border: 1px solid #dbe4f4;
+    box-shadow: 0 24px 40px rgba(10, 18, 37, .24);
+    padding: 16px;
+    display: grid;
+    gap: 12px;
+}
+
+.profile-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.profile-modal-head h2 {
+    margin: 0;
+    font-size: 1.18rem;
+}
+
+.profile-modal-close {
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d7deed;
+    border-radius: 10px;
+    background: #f7faff;
+    color: #4f5d84;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.profile-modal-sub {
+    margin: 0;
+    color: #5d6e96;
+    font-weight: 700;
+}
+
+.profile-modal-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.profile-modal-badge {
+    border: 1px solid #e2e9f6;
+    border-radius: 14px;
+    padding: 12px;
+    background: #fff;
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    text-align: center;
+}
+
+.profile-modal-badge.locked {
+    opacity: .84;
+}
+
+.profile-modal-badge small {
+    color: #67779f;
+    font-size: .82rem;
+    min-height: 34px;
+}
+
+.profile-modal-badge-meta {
+    color: #2b3f70;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+body.modal-open {
+    overflow: hidden;
 }
 
 .card-sub {
@@ -428,6 +558,10 @@
         margin: 0 auto;
     }
 
+    .profile-modal-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .level-line {
         grid-template-columns: 1fr;
         justify-items: start;
@@ -444,6 +578,12 @@
     .avatar-options,
     .badge-row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .profile-modal-grid {
+        grid-template-columns: 1fr;
     }
 }
 

@@ -129,53 +129,9 @@ function shortText(string|null $value, int $limit = 42): string
     </aside>
 
     <main class="lq-main">
-        <header class="lq-topbar">
-            <button class="icon-btn">☰</button>
-
-            <div class="search-box">
-                <span>
-                    <svg id="Search" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="11.2481" cy="10.7887" r="8.03854" stroke="#7b86a3" stroke-width="1.5" stroke-linecap="square"></circle>
-                        <path d="M16.7369 16.7083L21.2904 21.2499" stroke="#7b86a3" stroke-width="1.5" stroke-linecap="square"></path>
-                    </svg>
-                </span>
-                <input type="search" placeholder="Buscar misiones, hábitos o recompensas..." disabled>
-                <kbd>⌘ K</kbd>
-            </div>
-
-            <div class="top-stats">
-                <div class="xp-pill">
-                    <span>✦</span>
-                    <strong><?= number_format($xpCurrent, 0, ',', '.') ?> XP</strong>
-                    <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
-                    <small>Nivel <?= $level ?></small>
-                </div>
-
-                <div class="currency-pill coin">
-                    <span>🪙</span>
-                    <strong><?= number_format($points, 0, ',', '.') ?></strong>
-                </div>
-
-                <div class="currency-pill gem">
-                    <span>💎</span>
-                    <strong><?= $gems ?></strong>
-                </div>
-
-                <?php if ($hpSystemEnabled): ?>
-                    <div class="currency-pill hp">
-                        <span>❤️</span>
-                        <strong><?= number_format($hp, 0, ',', '.') ?>/<?= number_format($maxHp, 0, ',', '.') ?></strong>
-                    </div>
-                <?php endif; ?>
-
-                <button class="icon-btn">🔔</button>
-
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'], 0, 1)) ?></div>
-                    <strong>¡Hola, <?= e(shortText($user['name'], 12)) ?>! 👋</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar misiones, hábitos o recompensas...'; ?>
+        <?php $topbarShowHp = $hpSystemEnabled; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <div class="lq-dashboard-grid">
             <section class="lq-center">

@@ -4,6 +4,7 @@ require_once __DIR__ . '/../app/Controllers/AuthController.php';
 require_once __DIR__ . '/../app/Models/User.php';
 require_once __DIR__ . '/../app/Models/Task.php';
 require_once __DIR__ . '/../app/Models/Habit.php';
+require_once __DIR__ . '/../app/Models/Badge.php';
 require_once __DIR__ . '/../app/Support/StreakWeek.php';
 
 AuthController::requireAuth();
@@ -20,6 +21,7 @@ if (!$user) {
 
 $taskModel = new Task();
 $habitModel = new Habit();
+$badgeModel = new Badge();
 
 $tasks = $taskModel->getAllByUser($userId);
 $habits = $habitModel->getAllByUser($userId);
@@ -85,13 +87,15 @@ $avatarOptions = [
     ['name' => 'Nora', 'emoji' => '👩', 'tone' => 'tone-gold', 'active' => false],
 ];
 
-$badges = [
-    ['title' => 'Primer paso', 'xp' => '+50 XP', 'icon' => '👟', 'tone' => 'tone-green'],
-    ['title' => 'Constancia', 'xp' => '+100 XP', 'icon' => '🔥', 'tone' => 'tone-orange'],
-    ['title' => 'Estudioso', 'xp' => '+150 XP', 'icon' => '📘', 'tone' => 'tone-purple'],
-    ['title' => 'Enfoque total', 'xp' => '+200 XP', 'icon' => '🎯', 'tone' => 'tone-blue'],
-    ['title' => 'Imparable', 'xp' => '+250 XP', 'icon' => '🏆', 'tone' => 'tone-amber'],
-];
+$badges = $badgeModel->syncAndGetByUser($userId, [
+    'completed_tasks' => $completedTasks,
+    'completed_habit_checks' => $completedHabitChecks,
+    'best_streak' => $bestStreak,
+    'focused_minutes' => $focusedMinutes,
+    'level' => $level,
+]);
+
+$unlockedBadges = count(array_filter($badges, static fn(array $badge): bool => !empty($badge['unlocked'])));
 
 function e(string|null $value): string
 {
@@ -103,6 +107,29 @@ function shortText(string|null $value, int $limit = 42): string
     $value = trim((string) $value);
 
     return mb_strlen($value) <= $limit ? $value : mb_substr($value, 0, $limit - 1) . '...';
+}
+
+function badgeProgressLabel(array $badge): string
+{
+    if (!empty($badge['unlocked'])) {
+        $earnedAt = trim((string) ($badge['earned_at'] ?? ''));
+        if ($earnedAt === '') {
+            return 'Desbloqueada';
+        }
+
+        try {
+            $date = new DateTimeImmutable($earnedAt);
+            return 'Desbloqueada: ' . $date->format('d/m/Y');
+        } catch (Throwable) {
+            return 'Desbloqueada';
+        }
+    }
+
+    $value = max(0, (int) ($badge['progress_value'] ?? 0));
+    $target = max(1, (int) ($badge['target'] ?? 1));
+    $metric = trim((string) ($badge['metric_label'] ?? ''));
+
+    return $value . '/' . $target . ($metric !== '' ? ' ' . $metric : '');
 }
 ?>
 <!DOCTYPE html>
@@ -140,21 +167,9 @@ function shortText(string|null $value, int $limit = 42): string
     </aside>
 
     <main class="lq-main profile-main">
-        <header class="lq-topbar profile-topbar">
-            <div></div>
-            <div class="profile-top-stats">
-                <div class="currency-pill coin"><span>🪙</span><strong><?= number_format($points, 0, ',', '.') ?></strong></div>
-                <div class="currency-pill gem"><span>💎</span><strong><?= $gems ?></strong></div>
-                <?php if ($hpSystemEnabled): ?>
-                    <div class="currency-pill hp"><span>❤️</span><strong><?= number_format($hp, 0, ',', '.') ?>/<?= number_format($maxHp, 0, ',', '.') ?></strong></div>
-                <?php endif; ?>
-                <button class="notify-pill" type="button" aria-label="Notificaciones">🔔</button>
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-                    <strong>¡Hola, <?= $displayName ?>!</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar perfil, estadísticas o insignias...'; ?>
+        <?php $topbarShowHp = $hpSystemEnabled; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <section class="profile-shell">
             <section class="profile-grid-top">
@@ -236,15 +251,20 @@ function shortText(string|null $value, int $limit = 42): string
             <section class="profile-grid-bottom">
                 <article class="profile-card badges-card">
                     <div class="card-head-row">
-                        <h2>Insignias</h2>
-                        <a href="#">Ver todas</a>
+                        <h2>Insignias <span class="badges-counter"><?= $unlockedBadges ?>/<?= count($badges) ?> desbloqueadas</span></h2>
+                        <button type="button" class="link-like-btn" data-open-badges-modal>Ver todas</button>
                     </div>
                     <div class="badge-row">
                         <?php foreach ($badges as $badge): ?>
-                            <article class="badge-item">
+                            <article class="badge-item<?= !empty($badge['unlocked']) ? ' unlocked' : ' locked' ?>">
                                 <div class="badge-medal <?= e($badge['tone']) ?>" aria-hidden="true"><?= e($badge['icon']) ?></div>
                                 <strong><?= e($badge['title']) ?></strong>
-                                <small><?= e($badge['xp']) ?></small>
+                                <small><?= e(badgeProgressLabel($badge)) ?></small>
+                                <?php if (empty($badge['unlocked'])): ?>
+                                    <div class="badge-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= (int) ($badge['progress_percent'] ?? 0) ?>">
+                                        <i style="width: <?= (int) ($badge['progress_percent'] ?? 0) ?>%"></i>
+                                    </div>
+                                <?php endif; ?>
                             </article>
                         <?php endforeach; ?>
                     </div>
@@ -285,5 +305,71 @@ function shortText(string|null $value, int $limit = 42): string
             </section>
         </section>
     </main>
+
+    <div class="profile-modal-overlay" id="badges-modal" hidden>
+        <div class="profile-modal-card" role="dialog" aria-modal="true" aria-labelledby="badges-modal-title">
+            <div class="profile-modal-head">
+                <h2 id="badges-modal-title">Todas tus insignias</h2>
+                <button type="button" class="profile-modal-close" data-close-badges-modal aria-label="Cerrar modal">×</button>
+            </div>
+
+            <p class="profile-modal-sub"><?= $unlockedBadges ?>/<?= count($badges) ?> desbloqueadas</p>
+
+            <div class="profile-modal-grid">
+                <?php foreach ($badges as $badge): ?>
+                    <article class="profile-modal-badge<?= !empty($badge['unlocked']) ? ' unlocked' : ' locked' ?>">
+                        <div class="badge-medal <?= e($badge['tone']) ?>" aria-hidden="true"><?= e($badge['icon']) ?></div>
+                        <strong><?= e($badge['title']) ?></strong>
+                        <small><?= e((string) ($badge['description'] ?? '')) ?></small>
+                        <span class="profile-modal-badge-meta"><?= e(badgeProgressLabel($badge)) ?></span>
+                        <?php if (empty($badge['unlocked'])): ?>
+                            <div class="badge-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="<?= (int) ($badge['progress_percent'] ?? 0) ?>">
+                                <i style="width: <?= (int) ($badge['progress_percent'] ?? 0) ?>%"></i>
+                            </div>
+                        <?php endif; ?>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            var overlay = document.getElementById('badges-modal');
+            var openButton = document.querySelector('[data-open-badges-modal]');
+            var closeButton = document.querySelector('[data-close-badges-modal]');
+
+            if (!overlay || !openButton || !closeButton) {
+                return;
+            }
+
+            var closeModal = function () {
+                overlay.hidden = true;
+                overlay.classList.remove('is-open');
+                document.body.classList.remove('modal-open');
+            };
+
+            openButton.addEventListener('click', function () {
+                overlay.hidden = false;
+                overlay.classList.add('is-open');
+                document.body.classList.add('modal-open');
+            });
+
+            closeButton.addEventListener('click', closeModal);
+
+            overlay.addEventListener('click', function (event) {
+                if (event.target === overlay) {
+                    closeModal();
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !overlay.hidden) {
+                    closeModal();
+                }
+            });
+        })();
+
+    </script>
 </body>
 </html>

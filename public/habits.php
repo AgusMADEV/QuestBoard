@@ -53,7 +53,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $postTab = in_array((string) ($_POST['current_tab'] ?? $tab), $allowedTabs, true) ? (string) ($_POST['current_tab'] ?? $tab) : 'habits';
         $postPeriod = in_array((string) ($_POST['current_period'] ?? $period), $allowedPeriods, true) ? (string) ($_POST['current_period'] ?? $period) : 'week';
 
-        header('Location: habits.php?tab=' . urlencode($postTab) . '&period=' . urlencode($postPeriod) . '&message=' . urlencode($message) . '&type=' . $messageType);
+        $redirect = 'habits.php?tab=' . urlencode($postTab) . '&period=' . urlencode($postPeriod) . '&message=' . urlencode($message) . '&type=' . $messageType;
+        $badgeToasts = $_SESSION['badge_unlock_toasts'] ?? [];
+        if (is_array($badgeToasts) && !empty($badgeToasts)) {
+            $payload = base64_encode((string) json_encode($badgeToasts));
+            if ($payload !== '') {
+                $redirect .= '&badge_toasts=' . urlencode($payload);
+            }
+        }
+
+        header('Location: ' . $redirect);
         exit;
     }
 }
@@ -261,22 +270,8 @@ function habitEmojiByIndex(int $index): string
     </aside>
 
     <main class="lq-main">
-        <header class="lq-topbar">
-            <button class="icon-btn">☰</button>
-            <div class="search-box">
-                <span>🔎</span>
-                <input type="search" placeholder="Buscar hábitos..." disabled>
-                <kbd>⌘ K</kbd>
-            </div>
-            <div class="top-stats">
-                <div class="currency-pill coin"><span>🪙</span><strong><?= number_format((int) ($user['points'] ?? 0), 0, ',', '.') ?></strong></div>
-                <div class="currency-pill gem"><span>💎</span><strong><?= max(0, intdiv((int) ($user['points'] ?? 0), 20)) ?></strong></div>
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-                    <strong>¡Hola, <?= e(shortText($user['name'] ?? 'Usuario', 12)) ?>! 👋</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar hábitos...'; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <section class="lq-page-shell habits-shell">
             <header class="lq-page-hero habits-hero">

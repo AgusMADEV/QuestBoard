@@ -148,8 +148,88 @@ a {
     color: var(--muted);
 }
 
+.badge-toast {
+    position: fixed;
+    top: 18px;
+    right: 18px;
+    z-index: 9999;
+    min-width: 260px;
+    max-width: min(460px, calc(100vw - 24px));
+    border: 1px solid #ccefe3;
+    background: linear-gradient(140deg, #f6fff9, #ecfff6);
+    border-radius: 14px;
+    box-shadow: 0 14px 28px rgba(22, 120, 84, .18);
+    padding: 10px 12px;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    animation: badge-toast-in .25s ease-out;
+}
+
+.badge-toast.is-hiding {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition: opacity .2s ease, transform .2s ease;
+}
+
+.badge-toast-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: #d7f8e9;
+}
+
+.badge-toast-body {
+    display: grid;
+    gap: 2px;
+}
+
+.badge-toast-body strong {
+    color: #157559;
+    font-size: .88rem;
+}
+
+.badge-toast-body p {
+    margin: 0;
+    color: #305f52;
+    font-size: .82rem;
+}
+
+.badge-toast-close {
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 8px;
+    background: #e8faf1;
+    color: #357765;
+    line-height: 1;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+@keyframes badge-toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 /* Main app */
 
+    .badge-toast {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        max-width: none;
+    }
 .lifequest-app {
     min-height: 100vh;
     display: grid;
@@ -482,6 +562,16 @@ a {
     display: grid;
     place-items: center;
     background: rgba(255,255,255,.82);
+    box-shadow: var(--soft-shadow);
+    cursor: pointer;
+}
+
+.notify-pill {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.9);
     box-shadow: var(--soft-shadow);
     cursor: pointer;
 }

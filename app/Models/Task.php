@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../Database/connection.php';
 require_once __DIR__ . '/AreaProgression.php';
+require_once __DIR__ . '/Badge.php';
 
 final class Task
 {
@@ -278,6 +279,10 @@ final class Task
 
             $this->db->commit();
 
+            $badgeModel = new Badge($this->db);
+            $newlyUnlockedBadges = $badgeModel->syncAndCollectNewlyUnlocked($userId);
+            $this->pushBadgeUnlockToast($newlyUnlockedBadges);
+
             return [
                 'success' => true,
                 'message' => 'Misión completada. +' . (int) $task['xp_reward'] . ' XP y +' . (int) $task['points_reward'] . ' LifeCoins.'
@@ -301,6 +306,42 @@ final class Task
         if ($goalId !== null) {
             $this->refreshGoalProgress((int) $goalId);
         }
+    }
+
+    private function pushBadgeUnlockToast(array $badges): void
+    {
+        if (empty($badges)) {
+            return;
+        }
+
+        $existing = $_SESSION['badge_unlock_toasts'] ?? [];
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+
+        $already = [];
+        foreach ($existing as $badge) {
+            $code = (string) ($badge['code'] ?? '');
+            if ($code !== '') {
+                $already[$code] = true;
+            }
+        }
+
+        foreach ($badges as $badge) {
+            $code = (string) ($badge['code'] ?? '');
+            if ($code === '' || isset($already[$code])) {
+                continue;
+            }
+
+            $existing[] = [
+                'code' => $code,
+                'title' => (string) ($badge['title'] ?? 'Insignia'),
+                'icon' => (string) ($badge['icon'] ?? '🏅'),
+            ];
+            $already[$code] = true;
+        }
+
+        $_SESSION['badge_unlock_toasts'] = $existing;
     }
 
     private function refreshProjectProgress(int $projectId): void

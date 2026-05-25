@@ -134,6 +134,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $redirect .= '&period=' . urlencode($period);
         }
         $redirect .= '&message=' . urlencode($message) . '&type=' . $messageType;
+
+        $badgeToasts = $_SESSION['badge_unlock_toasts'] ?? [];
+        if (is_array($badgeToasts) && !empty($badgeToasts)) {
+            $payload = base64_encode((string) json_encode($badgeToasts));
+            if ($payload !== '') {
+                $redirect .= '&badge_toasts=' . urlencode($payload);
+            }
+        }
+
         header('Location: ' . $redirect);
         exit;
     }
@@ -333,27 +342,8 @@ function fieldError(array $errors, string $key): string
     </aside>
 
     <main class="lq-main">
-        <header class="lq-topbar">
-            <button class="icon-btn">☰</button>
-            <div class="search-box">
-                <span>🔎</span>
-                <input type="search" placeholder="<?= e($searchPlaceholder) ?>" disabled>
-                <kbd>⌘ K</kbd>
-            </div>
-            <div class="top-stats">
-                <div class="xp-pill">
-                    <span>✦</span>
-                    <strong><?= number_format((int) ($user['xp'] ?? 0), 0, ',', '.') ?> XP</strong>
-                    <div class="mini-progress"><i style="width: 35%"></i></div>
-                    <small>Nivel <?= (int) ($user['level'] ?? 1) ?></small>
-                </div>
-                <div class="currency-pill coin"><span>🪙</span><strong><?= number_format((int) ($user['points'] ?? 0), 0, ',', '.') ?></strong></div>
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'] ?? 'U', 0, 1)) ?></div>
-                    <strong>¡Hola, <?= e(shortText($user['name'] ?? 'Usuario', 12)) ?>! 👋</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = (string) $searchPlaceholder; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <section class="lq-page-shell metas-shell">
             <header class="lq-page-hero metas-hero">

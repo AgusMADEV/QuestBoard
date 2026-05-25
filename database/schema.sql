@@ -188,3 +188,14 @@ CREATE TABLE app_settings (
     setting_value VARCHAR(255) NOT NULL,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE user_badges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    badge_code VARCHAR(80) NOT NULL,
+    metric_value INT NOT NULL DEFAULT 0,
+    earned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_badge (user_id, badge_code),
+    INDEX idx_user_badges_user (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);

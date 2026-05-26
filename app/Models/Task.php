@@ -61,6 +61,7 @@ final class Task
                 LEFT JOIN life_areas ON tasks.area_id = life_areas.id
                 WHERE tasks.user_id = :user_id
                   AND tasks.status IN ('pending', 'in_progress', 'completed')
+                                    AND DATE(COALESCE(tasks.due_date, tasks.created_at)) = CURDATE()
                 ORDER BY
                     CASE tasks.status
                         WHEN 'in_progress' THEN 1
@@ -139,8 +140,13 @@ final class Task
                 )";
 
         $stmt = $this->db->prepare($sql);
+        $ok = $stmt->execute(['user_id' => $userId] + $data);
 
-        return $stmt->execute(['user_id' => $userId] + $data);
+        if ($ok) {
+            $this->refreshRelatedProgress($data['project_id'], $data['goal_id']);
+        }
+
+        return $ok;
     }
 
     public function update(int $id, int $userId, array $data): bool
@@ -377,23 +383,52 @@ final class Task
             'progress_not_completed' => $progress,
             'project_id' => $projectId,
         ]);
+
+        $goalStmt = $this->db->prepare(
+            "SELECT goal_id
+             FROM projects
+             WHERE id = :project_id
+             LIMIT 1"
+        );
+        $goalStmt->execute(['project_id' => $projectId]);
+        $project = $goalStmt->fetch();
+
+        if (isset($project['goal_id']) && $project['goal_id'] !== null) {
+            $this->refreshGoalProgress((int) $project['goal_id']);
+        }
     }
 
     private function refreshGoalProgress(int $goalId): void
     {
-        $stmt = $this->db->prepare(
+        $projectStatsStmt = $this->db->prepare(
             "SELECT COUNT(*) AS total,
-                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed
-             FROM tasks
+                    COALESCE(AVG(progress), 0) AS avg_progress
+             FROM projects
              WHERE goal_id = :goal_id
                AND status <> 'cancelled'"
         );
-        $stmt->execute(['goal_id' => $goalId]);
-        $stats = $stmt->fetch();
+        $projectStatsStmt->execute(['goal_id' => $goalId]);
+        $projectStats = $projectStatsStmt->fetch();
 
-        $total = (int) ($stats['total'] ?? 0);
-        $completed = (int) ($stats['completed'] ?? 0);
-        $progress = $total > 0 ? (int) round(($completed / $total) * 100) : 0;
+        $projectTotal = (int) ($projectStats['total'] ?? 0);
+
+        if ($projectTotal > 0) {
+            $progress = (int) round((float) ($projectStats['avg_progress'] ?? 0));
+        } else {
+            $taskStatsStmt = $this->db->prepare(
+                "SELECT COUNT(*) AS total,
+                        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed
+                 FROM tasks
+                 WHERE goal_id = :goal_id
+                   AND status <> 'cancelled'"
+            );
+            $taskStatsStmt->execute(['goal_id' => $goalId]);
+            $taskStats = $taskStatsStmt->fetch();
+
+            $taskTotal = (int) ($taskStats['total'] ?? 0);
+            $taskCompleted = (int) ($taskStats['completed'] ?? 0);
+            $progress = $taskTotal > 0 ? (int) round(($taskCompleted / $taskTotal) * 100) : 0;
+        }
 
         $update = $this->db->prepare(
             "UPDATE goals

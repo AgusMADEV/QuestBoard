@@ -390,20 +390,51 @@
     text-align: right;
 }
 
-.fake-chart {
-    height: 120px;
-    display: flex;
-    align-items: end;
-    gap: 12px;
-    padding: 16px 0 10px;
-    border-bottom: 1px solid var(--line);
+.dashboard-weekly-chart {
+    min-height: 156px;
+    border-radius: 14px;
+    border: 1px solid #edf1fb;
+    background:
+        linear-gradient(180deg, rgba(22,199,154,.08), rgba(22,199,154,0) 45%),
+        linear-gradient(0deg, #fff, #fff);
+    padding: 6px 6px 0;
+    overflow: hidden;
 }
 
-.fake-chart span {
-    flex: 1;
-    min-width: 18px;
-    border-radius: 999px 999px 0 0;
-    background: linear-gradient(180deg, var(--primary), rgba(22,199,154,.18));
+.dashboard-weekly-chart svg {
+    width: 100%;
+    height: 190px;
+    display: block;
+}
+
+.dashboard-weekly-chart .axis-label {
+    font-size: 11px;
+    fill: #60709b;
+    font-weight: 700;
+}
+
+.dashboard-weekly-chart .grid-line {
+    stroke: #e8eef9;
+    stroke-width: 1;
+}
+
+.dashboard-weekly-chart .y-axis-label {
+    font-size: 10px;
+    fill: #7a88a9;
+    font-weight: 700;
+}
+
+.dashboard-weekly-chart .future-line {
+    stroke: #79bda9;
+    stroke-width: 2.5;
+    stroke-dasharray: 6 6;
+    opacity: .95;
+}
+
+.dashboard-weekly-chart .dot {
+    fill: #ffffff;
+    stroke: #16c79a;
+    stroke-width: 2;
 }
 
 .chart-card > strong {

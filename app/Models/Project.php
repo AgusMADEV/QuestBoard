@@ -74,11 +74,19 @@ final class Project
                 VALUES (:user_id, :goal_id, :area_id, :title, :description, :status, :progress, :start_date, :due_date)";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['user_id' => $userId] + $data);
+        $ok = $stmt->execute(['user_id' => $userId] + $data);
+
+        if ($ok && $data['goal_id'] !== null) {
+            $this->refreshGoalProgress((int) $data['goal_id']);
+        }
+
+        return $ok;
     }
 
     public function update(int $id, int $userId, array $data): bool
     {
+        $previous = $this->findByIdAndUser($id, $userId);
+
         $sql = "UPDATE projects 
                 SET goal_id = :goal_id,
                     area_id = :area_id,
@@ -91,18 +99,94 @@ final class Project
                 WHERE id = :id AND user_id = :user_id";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute(['id' => $id, 'user_id' => $userId] + $data);
+        $ok = $stmt->execute(['id' => $id, 'user_id' => $userId] + $data);
+
+        if ($ok) {
+            $previousGoalId = isset($previous['goal_id']) ? (int) $previous['goal_id'] : null;
+            $newGoalId = $data['goal_id'] !== null ? (int) $data['goal_id'] : null;
+
+            if ($previousGoalId !== null) {
+                $this->refreshGoalProgress($previousGoalId);
+            }
+
+            if ($newGoalId !== null && $newGoalId !== $previousGoalId) {
+                $this->refreshGoalProgress($newGoalId);
+            }
+        }
+
+        return $ok;
     }
 
     public function delete(int $id, int $userId): bool
     {
+        $project = $this->findByIdAndUser($id, $userId);
+
         $sql = "DELETE FROM projects 
                 WHERE id = :id AND user_id = :user_id";
 
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([
+        $ok = $stmt->execute([
             'id' => $id,
             'user_id' => $userId
+        ]);
+
+        if ($ok && isset($project['goal_id']) && $project['goal_id'] !== null) {
+            $this->refreshGoalProgress((int) $project['goal_id']);
+        }
+
+        return $ok;
+    }
+
+    private function refreshGoalProgress(int $goalId): void
+    {
+        $projectStatsStmt = $this->db->prepare(
+            "SELECT COUNT(*) AS total,
+                    COALESCE(AVG(progress), 0) AS avg_progress
+             FROM projects
+             WHERE goal_id = :goal_id
+               AND status <> 'cancelled'"
+        );
+        $projectStatsStmt->execute(['goal_id' => $goalId]);
+        $projectStats = $projectStatsStmt->fetch();
+
+        $projectTotal = (int) ($projectStats['total'] ?? 0);
+
+        if ($projectTotal > 0) {
+            $progress = (int) round((float) ($projectStats['avg_progress'] ?? 0));
+        } else {
+            $taskStatsStmt = $this->db->prepare(
+                "SELECT COUNT(*) AS total,
+                        SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS completed
+                 FROM tasks
+                 WHERE goal_id = :goal_id
+                   AND status <> 'cancelled'"
+            );
+            $taskStatsStmt->execute(['goal_id' => $goalId]);
+            $taskStats = $taskStatsStmt->fetch();
+
+            $taskTotal = (int) ($taskStats['total'] ?? 0);
+            $taskCompleted = (int) ($taskStats['completed'] ?? 0);
+            $progress = $taskTotal > 0 ? (int) round(($taskCompleted / $taskTotal) * 100) : 0;
+        }
+
+        $update = $this->db->prepare(
+            "UPDATE goals
+             SET progress = :progress,
+                 status = CASE
+                    WHEN :progress_completed = 100 THEN 'completed'
+                    WHEN status = 'completed' AND :progress_not_completed < 100 THEN 'in_progress'
+                    WHEN status = 'not_started' AND :progress_started > 0 THEN 'in_progress'
+                    ELSE status
+                 END
+             WHERE id = :goal_id"
+        );
+
+        $update->execute([
+            'progress' => $progress,
+            'progress_completed' => $progress,
+            'progress_not_completed' => $progress,
+            'progress_started' => $progress,
+            'goal_id' => $goalId,
         ]);
     }
 }

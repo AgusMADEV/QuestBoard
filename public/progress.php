@@ -7,6 +7,7 @@ require_once __DIR__ . '/../app/Models/Habit.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
 require_once __DIR__ . '/../app/Models/Project.php';
 require_once __DIR__ . '/../app/Support/StreakWeek.php';
+require_once __DIR__ . '/../app/Support/XpEvolutionChart.php';
 
 AuthController::requireAuth();
 
@@ -212,157 +213,35 @@ if ($lastIndex >= 0 && $segmentStart !== 100) {
 $donutGradient = 'conic-gradient(' . implode(', ', $chartSegments) . ')';
 
 $weekActivity = buildWeeklyActivityByUser($userId, $weekStart);
-$xpByDate = [];
-
-for ($cursor = $periodStartDate; $cursor <= $periodEndDate; $cursor = $cursor->modify('+1 day')) {
-    $xpByDate[$cursor->format('Y-m-d')] = 0;
-}
-
-foreach ($tasks as $task) {
-    if ((string) ($task['status'] ?? '') !== 'completed') {
-        continue;
-    }
-
-    $completedAtRaw = (string) ($task['completed_at'] ?? '');
-    if ($completedAtRaw === '') {
-        continue;
-    }
-
-    try {
-        $completedAt = new DateTimeImmutable($completedAtRaw);
-    } catch (Throwable $exception) {
-        continue;
-    }
-
-    if ($completedAt < $periodStartDate || $completedAt > $periodEndDate) {
-        continue;
-    }
-
-    $dateKey = $completedAt->format('Y-m-d');
-    if (!isset($xpByDate[$dateKey])) {
-        continue;
-    }
-
-    $xpByDate[$dateKey] += (int) ($task['xp_reward'] ?? 0);
-}
-
-foreach ($habitLogs as $habitId => $dateMap) {
-    $habit = $habitMap[(int) $habitId] ?? null;
-    if (!$habit) {
-        continue;
-    }
-
-    $habitXp = (int) ($habit['xp_reward'] ?? 0);
-    foreach ($dateMap as $date => $done) {
-        if ($done && isset($xpByDate[$date])) {
-            $xpByDate[$date] += $habitXp;
-        }
-    }
-}
-
-$xpLinePoints = [];
-$cumulativeXp = 0;
-
-foreach ($xpByDate as $date => $gain) {
-    $cumulativeXp += (int) $gain;
-    $dateObj = new DateTimeImmutable($date);
-    $isFuture = $date > $todayDateKey;
-    $xpLinePoints[] = [
-        'label' => $metricPeriod === 'week' ? ['L', 'M', 'X', 'J', 'V', 'S', 'D'][(int) $dateObj->format('N') - 1] : $dateObj->format('j'),
-        'value' => $cumulativeXp,
-        'gain' => (int) $gain,
-        'is_future' => $isFuture,
-    ];
-}
-
-$maxLineValue = max(array_map(static fn(array $point): int => (int) $point['value'], $xpLinePoints));
-$axisStep = 500;
-$axisMax = max($axisStep * 2, (int) (ceil($maxLineValue / $axisStep) * $axisStep));
-
 $lineChartWidth = 620;
 $lineChartHeight = 220;
-$linePadX = 28;
-$linePadTop = 20;
-$linePadBottom = 38;
-$linePlotWidth = $lineChartWidth - ($linePadX * 2);
-$linePlotHeight = $lineChartHeight - $linePadTop - $linePadBottom;
-$lineCount = max(1, count($xpLinePoints) - 1);
-$lineCoords = [];
+$axisStep = 500;
 
-foreach ($xpLinePoints as $index => $point) {
-    $x = $linePadX + (int) round(($linePlotWidth / $lineCount) * $index);
-    $y = $linePadTop + (int) round((1 - ((int) $point['value'] / max(1, $axisMax))) * $linePlotHeight);
-    $lineCoords[] = [
-        'x' => $x,
-        'y' => $y,
-        'label' => $point['label'],
-        'value' => (int) $point['value'],
-        'gain' => (int) ($point['gain'] ?? 0),
-        'is_future' => (bool) ($point['is_future'] ?? false),
-    ];
-}
+$xpChart = XpEvolutionChart::build(
+    $tasks,
+    $habits,
+    $habitLogs,
+    $periodStartDate,
+    $periodEndDate,
+    $metricPeriod,
+    $todayDateKey,
+    $lineChartWidth,
+    $lineChartHeight,
+    $axisStep
+);
 
-$axisTicks = [];
-for ($axisValue = 0; $axisValue <= $axisMax; $axisValue += $axisStep) {
-    $axisY = $linePadTop + (int) round((1 - ($axisValue / max(1, $axisMax))) * $linePlotHeight);
-    $axisTicks[] = [
-        'value' => $axisValue,
-        'y' => $axisY,
-        'label' => formatAxisXp($axisValue),
-    ];
-}
-
-$linePolyline = '';
-$futureLinePolyline = '';
-$lineAreaPath = '';
-$futureAreaPath = '';
-$futureAreaStartX = 0;
-$futureAreaEndX = 0;
-$firstFutureIndex = null;
-
-foreach ($lineCoords as $index => $point) {
-    if (!empty($point['is_future'])) {
-        $firstFutureIndex = $index;
-        break;
-    }
-}
-
-$realLineCoords = $lineCoords;
-$futureLineCoords = [];
-
-if ($firstFutureIndex !== null) {
-    $realLineCoords = array_slice($lineCoords, 0, $firstFutureIndex);
-    $futureStart = max(0, $firstFutureIndex - 1);
-    $futureLineCoords = array_slice($lineCoords, $futureStart);
-}
-
-if (!empty($realLineCoords)) {
-    $linePolyline = implode(' ', array_map(static fn(array $p): string => $p['x'] . ',' . $p['y'], $realLineCoords));
-}
-
-if (!empty($lineCoords)) {
-    $firstPoint = $lineCoords[0];
-    $lastPoint = $lineCoords[count($lineCoords) - 1];
-    $lineAreaPath = 'M' . $firstPoint['x'] . ' ' . ($lineChartHeight - $linePadBottom)
-        . ' L' . $firstPoint['x'] . ' ' . $firstPoint['y']
-        . ' L' . implode(' L', array_map(static fn(array $p): string => $p['x'] . ' ' . $p['y'], $lineCoords))
-        . ' L' . $lastPoint['x'] . ' ' . ($lineChartHeight - $linePadBottom)
-        . ' Z';
-}
-
-if (!empty($futureLineCoords)) {
-    $futureLinePolyline = implode(' ', array_map(static fn(array $p): string => $p['x'] . ',' . $p['y'], $futureLineCoords));
-
-    $futureFirstPoint = $futureLineCoords[0];
-    $futureLastPoint = $futureLineCoords[count($futureLineCoords) - 1];
-    $futureAreaStartX = (int) $futureFirstPoint['x'];
-    $futureAreaEndX = (int) $futureLastPoint['x'];
-    $futureAreaPath = 'M' . $futureFirstPoint['x'] . ' ' . ($lineChartHeight - $linePadBottom)
-        . ' L' . $futureFirstPoint['x'] . ' ' . $futureFirstPoint['y']
-        . ' L' . implode(' L', array_map(static fn(array $p): string => $p['x'] . ' ' . $p['y'], $futureLineCoords))
-        . ' L' . $futureLastPoint['x'] . ' ' . ($lineChartHeight - $linePadBottom)
-        . ' Z';
-}
+$xpLinePoints = $xpChart['xpLinePoints'];
+$linePadX = $xpChart['linePadX'];
+$linePadTop = $xpChart['linePadTop'];
+$linePadBottom = $xpChart['linePadBottom'];
+$axisTicks = $xpChart['axisTicks'];
+$lineCoords = $xpChart['lineCoords'];
+$linePolyline = $xpChart['linePolyline'];
+$futureLinePolyline = $xpChart['futureLinePolyline'];
+$lineAreaPath = $xpChart['lineAreaPath'];
+$futureAreaPath = $xpChart['futureAreaPath'];
+$futureAreaStartX = $xpChart['futureAreaStartX'];
+$futureAreaEndX = $xpChart['futureAreaEndX'];
 
 $trendHeights = [];
 
@@ -441,19 +320,6 @@ function shortText(string|null $value, int $limit = 42): string
     return mb_strlen($value) <= $limit ? $value : mb_substr($value, 0, $limit - 1) . '...';
 }
 
-function formatAxisXp(int $value): string
-{
-    if ($value >= 1000) {
-        $compact = $value / 1000;
-        $formatted = fmod($compact, 1.0) === 0.0
-            ? (string) (int) $compact
-            : rtrim(rtrim(number_format($compact, 1, '.', ''), '0'), '.');
-
-        return $formatted . 'K';
-    }
-
-    return number_format($value, 0, ',', '.');
-}
 ?>
 <!DOCTYPE html>
 <html lang="es">

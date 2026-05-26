@@ -6,8 +6,10 @@ require_once __DIR__ . '/../app/Models/LifeArea.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
 require_once __DIR__ . '/../app/Models/Project.php';
 require_once __DIR__ . '/../app/Models/Task.php';
+require_once __DIR__ . '/../app/Models/Habit.php';
 require_once __DIR__ . '/../app/Models/AreaProgression.php';
 require_once __DIR__ . '/../app/Support/StreakWeek.php';
+require_once __DIR__ . '/../app/Support/XpEvolutionChart.php';
 
 AuthController::requireAuth();
 
@@ -30,8 +32,53 @@ $projectModel = new Project();
 $activeProjects = $projectModel->getActiveByUser((int) $user['id'], 4);
 
 $taskModel = new Task();
+$habitModel = new Habit();
 $todayTasks = $taskModel->getTodayByUser((int) $user['id'], 4);
 $weekActivity = buildWeeklyActivityByUser((int) $user['id']);
+
+$chartTasks = $taskModel->getAllByUser((int) $user['id']);
+$chartHabits = $habitModel->getAllByUser((int) $user['id']);
+
+$weekStartDate = (new DateTimeImmutable('monday this week'))->setTime(0, 0);
+$weekEndDate = $weekStartDate->modify('+6 days')->setTime(23, 59, 59);
+$todayDateKey = (new DateTimeImmutable('today'))->format('Y-m-d');
+
+$habitLogs = $habitModel->getLogsByRange(
+    (int) $user['id'],
+    $weekStartDate->format('Y-m-d'),
+    $weekEndDate->format('Y-m-d')
+);
+
+$lineChartWidth = 420;
+$lineChartHeight = 190;
+$axisStep = 250;
+
+$xpChart = XpEvolutionChart::build(
+    $chartTasks,
+    $chartHabits,
+    $habitLogs,
+    $weekStartDate,
+    $weekEndDate,
+    'week',
+    $todayDateKey,
+    $lineChartWidth,
+    $lineChartHeight,
+    $axisStep
+);
+
+$weeklyXpGain = $xpChart['periodXpGain'];
+$linePadX = $xpChart['linePadX'];
+$linePadTop = $xpChart['linePadTop'];
+$linePadBottom = $xpChart['linePadBottom'];
+$axisTicks = $xpChart['axisTicks'];
+$lineCoords = $xpChart['lineCoords'];
+$linePolyline = $xpChart['linePolyline'];
+$futureLinePolyline = $xpChart['futureLinePolyline'];
+$lineAreaPath = $xpChart['lineAreaPath'];
+$futureAreaPath = $xpChart['futureAreaPath'];
+$futureAreaStartX = $xpChart['futureAreaStartX'];
+$futureAreaEndX = $xpChart['futureAreaEndX'];
+$chartTotalXp = $xpChart['chartTotalXp'];
 
 $xpCurrent = (int) $user['xp'];
 $level = max(1, (int) $user['level']);
@@ -85,6 +132,7 @@ function shortText(string|null $value, int $limit = 42): string
 
     return mb_substr($value, 0, $limit - 1) . '…';
 }
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -291,21 +339,52 @@ function shortText(string|null $value, int $limit = 42): string
                     <article class="lq-card compact chart-card">
                         <div class="lq-card-header">
                             <h2>Progreso semanal</h2>
-                            <select disabled>
-                                <option>Esta semana</option>
-                            </select>
                         </div>
-                        <div class="fake-chart">
-                            <span style="height: 28%"></span>
-                            <span style="height: 42%"></span>
-                            <span style="height: 39%"></span>
-                            <span style="height: 58%"></span>
-                            <span style="height: 72%"></span>
-                            <span style="height: 84%"></span>
-                            <span style="height: 96%"></span>
+                        <div class="dashboard-weekly-chart">
+                            <svg viewBox="0 0 <?= $lineChartWidth ?> <?= $lineChartHeight ?>" aria-label="Gráfico semanal de XP">
+                                <defs>
+                                    <linearGradient id="dashboardXpLine" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#1ed7a5" stop-opacity="1" />
+                                        <stop offset="100%" stop-color="#16c79a" stop-opacity="1" />
+                                    </linearGradient>
+                                    <linearGradient id="dashboardXpArea" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#16c79a" stop-opacity="0.22" />
+                                        <stop offset="100%" stop-color="#16c79a" stop-opacity="0.03" />
+                                    </linearGradient>
+                                    <?php if ($futureAreaPath !== '' && $futureAreaEndX > $futureAreaStartX): ?>
+                                        <linearGradient id="dashboardXpAreaFutureFade" gradientUnits="userSpaceOnUse" x1="<?= $futureAreaStartX ?>" x2="<?= $futureAreaEndX ?>" y1="0" y2="0">
+                                            <stop offset="0%" stop-color="#ffffff" stop-opacity="0" />
+                                            <stop offset="100%" stop-color="#ffffff" stop-opacity="0.62" />
+                                        </linearGradient>
+                                    <?php endif; ?>
+                                </defs>
+
+                                <?php foreach ($axisTicks as $tick): ?>
+                                    <line x1="<?= $linePadX ?>" y1="<?= $tick['y'] ?>" x2="<?= $lineChartWidth - $linePadX ?>" y2="<?= $tick['y'] ?>" class="grid-line"></line>
+                                    <text x="8" y="<?= $tick['y'] + 4 ?>" class="y-axis-label"><?= e($tick['label']) ?></text>
+                                <?php endforeach; ?>
+
+                                <path d="<?= e($lineAreaPath) ?>" fill="url(#dashboardXpArea)"></path>
+                                <?php if ($futureAreaPath !== '' && $futureAreaEndX > $futureAreaStartX): ?>
+                                    <path d="<?= e($futureAreaPath) ?>" fill="url(#dashboardXpAreaFutureFade)"></path>
+                                <?php endif; ?>
+                                <polyline points="<?= e($linePolyline) ?>" fill="none" stroke="url(#dashboardXpLine)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                <?php if ($futureLinePolyline !== ''): ?>
+                                    <polyline class="future-line" points="<?= e($futureLinePolyline) ?>" fill="none" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                                <?php endif; ?>
+
+                                <?php foreach ($lineCoords as $point): ?>
+                                    <circle class="dot" cx="<?= $point['x'] ?>" cy="<?= $point['y'] ?>" r="3.2"></circle>
+                                    <title><?= e($point['label'] . ': ' . number_format((int) $point['value'], 0, ',', '.') . ' XP acumulada') ?></title>
+                                <?php endforeach; ?>
+
+                                <?php foreach ($lineCoords as $point): ?>
+                                    <text x="<?= $point['x'] ?>" y="<?= $lineChartHeight - 10 ?>" text-anchor="middle" class="axis-label"><?= e($point['label']) ?></text>
+                                <?php endforeach; ?>
+                            </svg>
                         </div>
-                        <strong><?= number_format($xpCurrent + 1250, 0, ',', '.') ?> XP</strong>
-                        <small>de <?= number_format($xpNext, 0, ',', '.') ?> XP</small>
+                        <strong><?= number_format($chartTotalXp, 0, ',', '.') ?> XP</strong>
+                        <small>+<?= number_format($weeklyXpGain, 0, ',', '.') ?> esta semana</small>
                     </article>
 
                     <article class="lq-card compact summary-card">

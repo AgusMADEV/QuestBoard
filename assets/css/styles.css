@@ -38,6 +38,17 @@ body {
     color: var(--text);
 }
 
+@media (min-width: 1181px) {
+    html,
+    body {
+        height: 100%;
+    }
+
+    body {
+        overflow: hidden;
+    }
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -236,6 +247,13 @@ a {
     grid-template-columns: 292px 1fr;
 }
 
+@supports (height: 100dvh) {
+    .lifequest-app,
+    .app-body {
+        min-height: 100dvh;
+    }
+}
+
 .lq-sidebar {
     min-height: 100vh;
     padding: 34px 26px;
@@ -247,6 +265,13 @@ a {
     gap: 24px;
     position: sticky;
     top: 0;
+}
+
+@supports (height: 100dvh) {
+    .lq-sidebar,
+    .sidebar {
+        min-height: 100dvh;
+    }
 }
 
 .lq-logo {
@@ -543,6 +568,21 @@ a {
 .lq-main {
     min-width: 0;
     padding: 28px 28px 36px;
+}
+
+@media (min-width: 1181px) {
+    .lq-main,
+    .dashboard {
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    @supports (height: 100dvh) {
+        .lq-main,
+        .dashboard {
+            height: 100dvh;
+        }
+    }
 }
 
 .lq-topbar {
@@ -1012,6 +1052,15 @@ a {
 /* Responsive */
 
 @media (max-width: 1180px) {
+    html,
+    body {
+        height: auto;
+    }
+
+    body {
+        overflow: auto;
+    }
+
     .lifequest-app,
     .app-body {
         grid-template-columns: 1fr;
@@ -1098,6 +1147,336 @@ a {
 
     .dashboard-header {
         flex-direction: column;
+    }
+}
+
+@media (min-width: 1181px) and (max-height: 1080px) and (min-height: 921px) {
+    .lifequest-app,
+    .app-body {
+        grid-template-columns: 268px 1fr;
+    }
+
+    .lq-main,
+    .dashboard {
+        padding: 18px 20px 18px;
+    }
+
+    .lq-topbar {
+        margin-bottom: 16px;
+        gap: 14px;
+    }
+
+    .top-stats {
+        gap: 9px;
+    }
+
+    .xp-pill,
+    .currency-pill,
+    .profile-pill {
+        height: 44px;
+        border-radius: 14px;
+    }
+
+    .lq-sidebar,
+    .sidebar {
+        padding: 20px 14px;
+        gap: 10px;
+        overflow: hidden;
+    }
+
+    .lq-nav {
+        gap: 7px;
+    }
+
+    .lq-nav a {
+        min-height: 40px;
+        border-radius: 11px;
+        padding: 8px 9px;
+        font-size: .9rem;
+    }
+
+    .lq-sidebar-card {
+        padding: 10px;
+        border-radius: 13px;
+    }
+
+    .lq-sidebar-card p,
+    .lq-sidebar-card small {
+        font-size: .8rem;
+    }
+
+    .lq-sidebar-card strong {
+        font-size: 1rem;
+    }
+
+    .lq-sidebar-card.unlock {
+        display: none;
+    }
+
+    .lq-user-mini {
+        padding: 9px;
+    }
+}
+
+@media (min-width: 1181px) and (max-height: 900px) {
+    .lifequest-app,
+    .app-body {
+        grid-template-columns: 252px 1fr;
+    }
+
+    .lq-main,
+    .dashboard {
+        padding: 14px 16px 14px;
+    }
+
+    .lq-topbar {
+        min-height: 46px;
+        gap: 12px;
+        margin-bottom: 14px;
+        grid-template-columns: 42px minmax(220px, 1fr) minmax(0, auto);
+    }
+
+    .icon-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+    }
+
+    .search-box {
+        height: 42px;
+        border-radius: 14px;
+        padding: 0 12px;
+    }
+
+    .xp-pill,
+    .currency-pill,
+    .profile-pill {
+        height: 42px;
+        border-radius: 13px;
+        padding: 0 11px;
+    }
+
+    .xp-pill {
+        min-width: 188px;
+    }
+
+    .xp-pill > span,
+    .currency-pill span {
+        width: 26px;
+        height: 26px;
+        border-radius: 9px;
+    }
+
+    .notify-pill {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+    }
+
+    .top-stats {
+        gap: 8px;
+    }
+
+    .lq-sidebar,
+    .sidebar {
+        padding: 14px 10px;
+        gap: 8px;
+        overflow: hidden;
+    }
+
+    .lq-logo,
+    .sidebar-brand {
+        font-size: 1.6rem;
+    }
+
+    .lq-nav {
+        gap: 6px;
+    }
+
+    .lq-nav a {
+        min-height: 38px;
+        border-radius: 10px;
+        padding: 7px 8px;
+        font-size: .86rem;
+    }
+
+    .lq-sidebar-card {
+        padding: 9px;
+        border-radius: 12px;
+    }
+
+    .lq-sidebar-card p,
+    .lq-sidebar-card small {
+        font-size: .78rem;
+    }
+
+    .lq-sidebar-card strong {
+        font-size: .95rem;
+    }
+
+    .lq-sidebar-card.unlock {
+        display: none;
+    }
+
+    .lq-user-mini {
+        margin-top: auto;
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .mini-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .lq-sidebar-bottom a {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+    }
+}
+
+@media (min-width: 1181px) and (min-height: 901px) and (max-height: 920px) {
+    .lifequest-app,
+    .app-body {
+        grid-template-columns: 260px 1fr;
+    }
+
+    .lq-main,
+    .dashboard {
+        padding: 16px 18px 14px;
+    }
+
+    .lq-topbar {
+        min-height: 44px;
+        gap: 12px;
+        margin-bottom: 12px;
+        grid-template-columns: 42px minmax(220px, 1fr) minmax(0, auto);
+    }
+
+    .icon-btn {
+        width: 42px;
+        height: 42px;
+        border-radius: 13px;
+    }
+
+    .search-box {
+        height: 42px;
+        border-radius: 14px;
+        padding: 0 12px;
+    }
+
+    .xp-pill,
+    .currency-pill,
+    .profile-pill {
+        height: 42px;
+        border-radius: 13px;
+        padding: 0 11px;
+    }
+
+    .xp-pill {
+        min-width: 192px;
+    }
+
+    .top-stats {
+        gap: 8px;
+    }
+
+    .lq-sidebar,
+    .sidebar {
+        padding: 14px 11px;
+        gap: 8px;
+        overflow: hidden;
+    }
+
+    .lq-logo,
+    .sidebar-brand {
+        font-size: 1.62rem;
+    }
+
+    .lq-nav {
+        gap: 6px;
+    }
+
+    .lq-nav a {
+        min-height: 38px;
+        border-radius: 10px;
+        padding: 7px 8px;
+        font-size: .86rem;
+    }
+
+    .lq-sidebar-card {
+        padding: 9px;
+        border-radius: 12px;
+    }
+
+    .lq-sidebar-card p,
+    .lq-sidebar-card small {
+        font-size: .78rem;
+    }
+
+    .lq-sidebar-card strong {
+        font-size: .94rem;
+    }
+
+    .lq-sidebar-card.unlock {
+        display: none;
+    }
+
+    .lq-user-mini {
+        margin-top: auto;
+        padding: 8px;
+        border-radius: 12px;
+    }
+
+    .mini-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+    }
+
+    .lq-sidebar-bottom a {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+    }
+}
+
+/* Viewport fit mode: mantiene proporciones y evita scroll vertical en desktop bajo */
+@media (min-width: 1181px) and (max-height: 900px) {
+    body {
+        overflow: hidden;
+    }
+
+    .lifequest-app,
+    .app-body {
+        --lq-fit-scale: .92;
+        transform: scale(var(--lq-fit-scale));
+        transform-origin: top left;
+        width: calc(100% / var(--lq-fit-scale));
+        min-height: calc(100vh / var(--lq-fit-scale));
+    }
+
+    @supports (height: 100dvh) {
+        .lifequest-app,
+        .app-body {
+            min-height: calc(100dvh / var(--lq-fit-scale));
+        }
+    }
+}
+
+@media (min-width: 1181px) and (max-height: 820px) {
+    .lifequest-app,
+    .app-body {
+        --lq-fit-scale: .86;
+    }
+}
+
+@media (min-width: 1181px) and (max-height: 740px) {
+    .lifequest-app,
+    .app-body {
+        --lq-fit-scale: .8;
     }
 }
 

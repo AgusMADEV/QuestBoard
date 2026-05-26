@@ -55,3 +55,5 @@ Para mantener coherencia interna y visual:
 - Misión = `tasks`
 
 Esta nomenclatura se usa en base de datos, backend y vistas.
+
+CambiaEstaClave!2026.

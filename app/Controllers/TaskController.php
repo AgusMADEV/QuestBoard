@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/Task.php';
+require_once __DIR__ . '/../Support/RewardCalculator.php';
 
 final class TaskController
 {
@@ -95,14 +96,16 @@ final class TaskController
         if ($title === '') {
             return [
                 'success' => false,
-                'message' => 'El título de la misión es obligatorio.'
+                'message' => 'El título de la misión es obligatorio.',
+                'errors' => ['title' => 'El título es obligatorio.'],
             ];
         }
 
         if (mb_strlen($title) > 150) {
             return [
                 'success' => false,
-                'message' => 'El título no puede superar los 150 caracteres.'
+                'message' => 'El título no puede superar los 150 caracteres.',
+                'errors' => ['title' => 'Máximo 150 caracteres.'],
             ];
         }
 
@@ -117,7 +120,8 @@ final class TaskController
             if (!$projectModel->findByIdAndUser($projectId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'El reto seleccionado no existe o no pertenece a tu usuario.'
+                    'message' => 'El reto seleccionado no existe o no pertenece a tu usuario.',
+                    'errors' => ['project_id' => 'Reto no válido para tu usuario.'],
                 ];
             }
         }
@@ -129,7 +133,8 @@ final class TaskController
             if (!$goalModel->findByIdAndUser($goalId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'El meta seleccionado no existe o no pertenece a tu usuario.'
+                    'message' => 'La meta seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['goal_id' => 'Meta no válida para tu usuario.'],
                 ];
             }
         }
@@ -141,7 +146,8 @@ final class TaskController
             if (!$lifeAreaModel->findByIdAndUser($areaId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.'
+                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['area_id' => 'Área no válida para tu usuario.'],
                 ];
             }
         }
@@ -151,6 +157,8 @@ final class TaskController
 
         $priority = in_array(($data['priority'] ?? ''), $allowedPriorities, true) ? $data['priority'] : 'medium';
         $status = in_array(($data['status'] ?? ''), $allowedStatuses, true) ? $data['status'] : 'pending';
+        $estimatedMinutes = max(0, (int) ($data['estimated_minutes'] ?? 0));
+        $reward = RewardCalculator::forTask($priority, $estimatedMinutes);
 
         return [
             'success' => true,
@@ -162,10 +170,10 @@ final class TaskController
                 'description' => trim($data['description'] ?? '') ?: null,
                 'priority' => $priority,
                 'status' => $status,
-                'estimated_minutes' => max(0, (int) ($data['estimated_minutes'] ?? 0)),
+                'estimated_minutes' => $estimatedMinutes,
                 'due_date' => trim($data['due_date'] ?? '') ?: null,
-                'xp_reward' => max(0, (int) ($data['xp_reward'] ?? 10)),
-                'points_reward' => max(0, (int) ($data['points_reward'] ?? 5)),
+                'xp_reward' => $reward['xp'],
+                'points_reward' => $reward['points'],
             ]
         ];
     }

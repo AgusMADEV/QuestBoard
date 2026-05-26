@@ -3,14 +3,18 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Database/connection.php';
+require_once __DIR__ . '/AreaProgression.php';
+require_once __DIR__ . '/Badge.php';
 
 final class Task
 {
     private PDO $db;
+    private AreaProgression $areaProgression;
 
     public function __construct()
     {
         $this->db = Connection::getConnection();
+        $this->areaProgression = new AreaProgression($this->db);
     }
 
     public function getAllByUser(int $userId): array
@@ -75,6 +79,34 @@ final class Task
         $stmt->execute();
 
         return $stmt->fetchAll();
+    }
+
+    public function getCompletedDatesByRange(int $userId, string $startDate, string $endDate): array
+    {
+        $sql = "SELECT DISTINCT DATE(COALESCE(completed_at, created_at)) AS completed_date
+                FROM tasks
+                WHERE user_id = :user_id
+                  AND status = 'completed'
+                  AND DATE(COALESCE(completed_at, created_at)) BETWEEN :start_date AND :end_date";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            'user_id' => $userId,
+            'start_date' => $startDate,
+            'end_date' => $endDate,
+        ]);
+
+        $dates = [];
+
+        foreach ($stmt->fetchAll() as $row) {
+            $date = (string) ($row['completed_date'] ?? '');
+
+            if ($date !== '') {
+                $dates[$date] = true;
+            }
+        }
+
+        return $dates;
     }
 
     public function findByIdAndUser(int $id, int $userId): ?array
@@ -237,9 +269,19 @@ final class Task
                 'user_id' => $userId,
             ]);
 
+            $this->areaProgression->addXp(
+                $userId,
+                isset($task['area_id']) ? (int) $task['area_id'] : null,
+                (int) $task['xp_reward']
+            );
+
             $this->refreshRelatedProgress($task['project_id'] ?? null, $task['goal_id'] ?? null);
 
             $this->db->commit();
+
+            $badgeModel = new Badge($this->db);
+            $newlyUnlockedBadges = $badgeModel->syncAndCollectNewlyUnlocked($userId);
+            $this->pushBadgeUnlockToast($newlyUnlockedBadges);
 
             return [
                 'success' => true,
@@ -264,6 +306,42 @@ final class Task
         if ($goalId !== null) {
             $this->refreshGoalProgress((int) $goalId);
         }
+    }
+
+    private function pushBadgeUnlockToast(array $badges): void
+    {
+        if (empty($badges)) {
+            return;
+        }
+
+        $existing = $_SESSION['badge_unlock_toasts'] ?? [];
+        if (!is_array($existing)) {
+            $existing = [];
+        }
+
+        $already = [];
+        foreach ($existing as $badge) {
+            $code = (string) ($badge['code'] ?? '');
+            if ($code !== '') {
+                $already[$code] = true;
+            }
+        }
+
+        foreach ($badges as $badge) {
+            $code = (string) ($badge['code'] ?? '');
+            if ($code === '' || isset($already[$code])) {
+                continue;
+            }
+
+            $existing[] = [
+                'code' => $code,
+                'title' => (string) ($badge['title'] ?? 'Insignia'),
+                'icon' => (string) ($badge['icon'] ?? '🏅'),
+            ];
+            $already[$code] = true;
+        }
+
+        $_SESSION['badge_unlock_toasts'] = $existing;
     }
 
     private function refreshProjectProgress(int $projectId): void

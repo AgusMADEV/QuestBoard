@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Models/Goal.php';
+require_once __DIR__ . '/../Support/RewardCalculator.php';
 
 final class GoalController
 {
@@ -50,8 +51,20 @@ final class GoalController
     private function validate(int $userId, array $data): array
     {
         $title = trim($data['title'] ?? '');
-        if ($title === '') return ['success' => false, 'message' => 'El título de la meta es obligatorio.'];
-        if (mb_strlen($title) > 150) return ['success' => false, 'message' => 'El título no puede superar los 150 caracteres.'];
+        if ($title === '') {
+            return [
+                'success' => false,
+                'message' => 'El título de la meta es obligatorio.',
+                'errors' => ['title' => 'El título es obligatorio.'],
+            ];
+        }
+        if (mb_strlen($title) > 150) {
+            return [
+                'success' => false,
+                'message' => 'El título no puede superar los 150 caracteres.',
+                'errors' => ['title' => 'Máximo 150 caracteres.'],
+            ];
+        }
 
         $areaId = ((int)($data['area_id'] ?? 0)) > 0 ? (int)$data['area_id'] : null;
         
@@ -60,7 +73,11 @@ final class GoalController
             require_once __DIR__ . '/../Models/LifeArea.php';
             $lifeAreaModel = new LifeArea();
             if (!$lifeAreaModel->findByIdAndUser($areaId, $userId)) {
-                return ['success' => false, 'message' => 'El área seleccionada no existe o no pertenece a tu usuario.'];
+                return [
+                    'success' => false,
+                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['area_id' => 'Área no válida para tu usuario.'],
+                ];
             }
         }
 
@@ -71,6 +88,7 @@ final class GoalController
         $type = in_array(($data['type'] ?? ''), $allowedTypes, true) ? $data['type'] : 'monthly';
         $priority = in_array(($data['priority'] ?? ''), $allowedPriorities, true) ? $data['priority'] : 'medium';
         $status = in_array(($data['status'] ?? ''), $allowedStatuses, true) ? $data['status'] : 'not_started';
+        $reward = RewardCalculator::forGoal($type, $priority);
 
         return [
             'success' => true,
@@ -84,8 +102,8 @@ final class GoalController
                 'progress' => max(0, min(100, (int)($data['progress'] ?? 0))),
                 'start_date' => trim($data['start_date'] ?? '') ?: null,
                 'due_date' => trim($data['due_date'] ?? '') ?: null,
-                'xp_reward' => max(0, (int)($data['xp_reward'] ?? 50)),
-                'points_reward' => max(0, (int)($data['points_reward'] ?? 25)),
+                'xp_reward' => $reward['xp'],
+                'points_reward' => $reward['points'],
             ]
         ];
     }

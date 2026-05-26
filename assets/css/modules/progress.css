@@ -1,0 +1,501 @@
+/* =========================================================
+   LifeQuest Progress module
+   ========================================================= */
+
+.progress-shell {
+    display: grid;
+    gap: 20px;
+}
+
+.progress-head {
+    padding: 6px 2px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.progress-head h1 {
+    margin: 0;
+    letter-spacing: -.045em;
+    font-size: 2.25rem;
+}
+
+.progress-head p {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.progress-filter {
+    display: grid;
+    gap: 6px;
+    justify-items: end;
+}
+
+.progress-filter label {
+    font-size: .75rem;
+    font-weight: 800;
+    color: #6b7698;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.progress-filter select {
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    padding: 8px 10px;
+    font-weight: 800;
+    color: #41517b;
+    background: #fff;
+}
+
+.progress-kpis {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.progress-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1.7fr 1fr 1.1fr;
+}
+
+.progress-card {
+    background: rgba(255,255,255,.94);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: 0 10px 24px rgba(48, 63, 120, .06);
+    padding: 18px;
+    overflow: visible;
+}
+
+.chart-card {
+    overflow: visible;
+    position: relative;
+    z-index: 6;
+}
+
+.progress-card small {
+    color: #4f5e87;
+    font-weight: 800;
+}
+
+.metric-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.metric-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    font-size: .9rem;
+}
+
+.metric-icon.xp {
+    background: #dcfff5;
+    color: #0ca678;
+}
+
+.metric-icon.coins {
+    background: #fff3d6;
+    color: #f59f00;
+}
+
+.metric-icon.activity {
+    background: #eef3ff;
+    color: #3b82f6;
+}
+
+.progress-card strong {
+    display: block;
+    margin-top: 6px;
+    font-size: 2.05rem;
+    letter-spacing: -.05em;
+    color: #15255a;
+}
+
+.progress-card em {
+    margin-top: 5px;
+    display: block;
+    color: #0ca678;
+    font-style: normal;
+    font-weight: 800;
+    font-size: .82rem;
+}
+
+.mini-trend {
+    margin-top: 10px;
+    height: 52px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    align-items: end;
+    gap: 6px;
+}
+
+.mini-trend i {
+    height: var(--h);
+    min-height: 6px;
+    border-radius: 999px;
+    display: block;
+    opacity: .95;
+}
+
+.trend-xp i {
+    background: linear-gradient(180deg, #33dfb1, #16c79a);
+}
+
+.trend-coins i {
+    background: linear-gradient(180deg, #ffc34a, #f59f00);
+}
+
+.trend-gems i {
+    background: linear-gradient(180deg, #af75ff, #8b5cf6);
+}
+
+.level-card {
+    display: grid;
+    grid-template-columns: 1fr 128px;
+    gap: 14px;
+    align-items: end;
+}
+
+.level-card p {
+    margin: 8px 0 10px;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: .88rem;
+}
+
+.level-avatar {
+    height: 120px;
+    border-radius: 20px;
+    background:
+        radial-gradient(circle at 50% 14%, rgba(255,255,255,.75), transparent 55%),
+        linear-gradient(160deg, #16c79a, #85e8c8);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+    font-size: 2rem;
+    box-shadow: inset 0 -14px 30px rgba(0,0,0,.1);
+}
+
+.card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.card-head h2 {
+    margin: 0;
+    font-size: 1.18rem;
+    letter-spacing: -.03em;
+}
+
+.card-head span {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 5px 9px;
+    color: #5b688f;
+    font-size: .8rem;
+    font-weight: 800;
+    background: #f8fbff;
+}
+
+.card-head a {
+    color: #4f5f8b;
+    font-weight: 800;
+    font-size: .84rem;
+}
+
+.xp-chart {
+    min-height: 236px;
+    border-radius: 14px;
+    border: 1px solid #edf1fb;
+    background:
+        linear-gradient(180deg, rgba(22,199,154,.08), rgba(22,199,154,0) 45%),
+        linear-gradient(0deg, #fff, #fff);
+    padding: 8px 8px 2px;
+    overflow: visible;
+    position: relative;
+    z-index: 8;
+}
+
+.xp-chart svg {
+    width: 100%;
+    min-width: 620px;
+    height: 220px;
+    display: block;
+    overflow: visible;
+    position: relative;
+    z-index: 9;
+}
+
+.xp-chart .axis-label {
+    font-size: 12px;
+    color: #60709b;
+    fill: #60709b;
+    font-weight: 700;
+}
+
+.xp-chart .grid-line {
+    stroke: #e8eef9;
+    stroke-width: 1;
+}
+
+.xp-chart .y-axis-label {
+    font-size: 12px;
+    fill: #7a88a9;
+    font-weight: 700;
+}
+
+.xp-chart .future-line {
+    stroke: #79bda9;
+    stroke-width: 3;
+    stroke-dasharray: 7 7;
+    opacity: .95;
+}
+
+.xp-chart .data-point .dot {
+    transition: transform .16s ease;
+    transform: scale(1);
+    transform-box: fill-box;
+    transform-origin: center;
+}
+
+.xp-chart .data-point:hover .dot {
+    transform: scale(1.22);
+}
+
+.xp-chart .data-point .dot-hit {
+    cursor: pointer;
+}
+
+.xp-chart .data-point.future .dot-hit {
+    cursor: default;
+}
+
+.xp-chart .data-point.future .dot {
+    fill: #ffffff;
+    stroke: #c8d4ea;
+    stroke-width: 2;
+    opacity: .9;
+}
+
+.xp-chart .point-tooltip {
+    opacity: 0;
+    transition: opacity .16s ease;
+    pointer-events: none;
+}
+
+.xp-chart .data-point:hover .point-tooltip {
+    opacity: 1;
+}
+
+.xp-chart .data-point.future .point-tooltip {
+    display: none;
+}
+
+.xp-chart .point-tooltip .bubble,
+.xp-chart .point-tooltip .bubble-tip {
+    fill: #dbf8ea;
+    stroke: #c4efd9;
+    stroke-width: 1;
+}
+
+.xp-chart .point-tooltip .bubble-text {
+    fill: #0ca678;
+    font-size: 14px;
+    font-weight: 800;
+}
+
+.mini-sparkline {
+    margin-top: 8px;
+}
+
+.mini-sparkline svg {
+    width: 100%;
+    height: 56px;
+    display: block;
+}
+
+.mini-sparkline .area {
+    opacity: .14;
+}
+
+.mini-sparkline .line {
+    fill: none;
+    stroke-width: 2.25;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.trend-xp .area {
+    fill: #16c79a;
+}
+
+.trend-xp .line {
+    stroke: #16c79a;
+}
+
+.trend-coins .area {
+    fill: #f59f00;
+}
+
+.trend-coins .line {
+    stroke: #f59f00;
+}
+
+.trend-gems .area {
+    fill: #8b5cf6;
+}
+
+.trend-gems .line {
+    stroke: #8b5cf6;
+}
+
+.categories-wrap {
+    display: grid;
+    gap: 16px;
+    align-items: center;
+}
+
+.donut {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto;
+    background: var(--donut);
+    position: relative;
+}
+
+.donut::after {
+    content: "";
+    position: absolute;
+    inset: 23px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #eef2fa;
+}
+
+.categories-list {
+    display: grid;
+    gap: 10px;
+}
+
+.categories-list div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.categories-list span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #4f5f8b;
+    font-weight: 700;
+}
+
+.categories-list span i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.categories-list strong {
+    margin: 0;
+    font-size: .95rem;
+    color: #243560;
+}
+
+.achievements-list {
+    display: grid;
+    gap: 10px;
+}
+
+.achievements-list article {
+    display: grid;
+    grid-template-columns: 34px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    background: #f9fbff;
+    border: 1px solid #ecf0fb;
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.achievements-list .badge {
+    width: 34px;
+    height: 34px;
+    border-radius: 12px;
+    background: #dcfff5;
+    color: #0ca678;
+    display: grid;
+    place-items: center;
+    font-weight: 900;
+}
+
+.achievements-list strong {
+    margin: 0;
+    font-size: .95rem;
+}
+
+.achievements-list small {
+    display: block;
+    margin-top: 3px;
+    color: #68779f;
+    font-size: .78rem;
+}
+
+.achievements-list em {
+    margin: 0;
+    font-size: .8rem;
+}
+
+@media (max-width: 1320px) {
+    .progress-kpis {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .progress-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-wrap {
+        grid-template-columns: 180px 1fr;
+    }
+}
+
+@media (max-width: 860px) {
+    .progress-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .progress-filter {
+        justify-items: start;
+    }
+
+    .progress-kpis {
+        grid-template-columns: 1fr;
+    }
+
+    .level-card {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-wrap {
+        grid-template-columns: 1fr;
+    }
+}

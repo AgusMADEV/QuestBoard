@@ -20,12 +20,12 @@ cd LifeQuest
 
 1. Crea una base de datos MySQL:
    ```sql
-   CREATE DATABASE questboard CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+   CREATE DATABASE lifequest CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
    ```
 
 2. Importa el esquema de la base de datos:
    ```bash
-   mysql -u tu_usuario -p questboard < database/schema.sql
+   mysql -u tu_usuario -p lifequest < database/schema.sql
    ```
 
 ### 3. Configurar el archivo de configuración
@@ -37,7 +37,7 @@ cd LifeQuest
 
 2. Edita `config/config.php` con tus credenciales:
    - `DB_HOST`: Host de tu base de datos (generalmente 'localhost')
-   - `DB_NAME`: Nombre de la base de datos ('questboard')
+   - `DB_NAME`: Nombre de la base de datos ('lifequest')
    - `DB_USER`: Usuario de MySQL
    - `DB_PASS`: Contraseña de MySQL
    - `APP_URL`: URL base de tu aplicación

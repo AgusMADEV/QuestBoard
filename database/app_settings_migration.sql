@@ -1,0 +1,23 @@
+-- Panel admin: runtime settings para balance
+
+CREATE TABLE app_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(120) NOT NULL UNIQUE,
+    setting_value VARCHAR(255) NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- Valores iniciales (fallback de config actual)
+INSERT INTO app_settings (setting_key, setting_value) VALUES
+('REWARD_POINTS_PER_XP', '0.5'),
+('REWARD_HABIT_BASE_XP', '10'),
+('REWARD_TASK_BASE_XP', '12'),
+('REWARD_GOAL_BASE_XP_DAILY', '16'),
+('REWARD_GOAL_BASE_XP_WEEKLY', '30'),
+('REWARD_GOAL_BASE_XP_MONTHLY', '50'),
+('REWARD_GOAL_BASE_XP_QUARTERLY', '70'),
+('REWARD_GOAL_BASE_XP_YEARLY', '95'),
+('REWARD_GOAL_BASE_XP_FUTURE', '110'),
+('INDULGENCE_REPEAT_COST_MULTIPLIER', '1.25'),
+('COSMETIC_PRICE_MULTIPLIER', '1.0')
+ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value);

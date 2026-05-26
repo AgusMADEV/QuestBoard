@@ -11,21 +11,27 @@ He actualizado el proyecto para que la identidad visible sea **LifeQuest**.
 - `APP_URL` a `http://localhost/LifeQuest/public`.
 - Nombre de sesión a `lifequest_session`.
 
-## Qué NO se ha cambiado para no romper tu instalación actual
+## Estado actual del repositorio
 
-He mantenido la base de datos actual tal como estaba:
+Actualmente el proyecto está configurado por defecto para usar:
+
+```php
+define('DB_NAME', 'lifequest');
+```
+
+Esto está alineado con `database/schema.sql`.
+
+Si vienes de una instalación antigua con `questboard`, solo cambia en tu `config/config.php`:
 
 ```php
 define('DB_NAME', 'questboard');
-define('DB_USER', 'questboard');
-define('DB_PASS', '159159159');
+define('DB_USER', 'tu_usuario_real');
+define('DB_PASS', 'tu_contraseña_real');
 ```
-
-Así puedes copiar estos archivos sobre tu proyecto actual sin tener que recrear la base de datos ni perder datos.
 
 ## Si quieres renombrar también la base de datos
 
-Más adelante podemos hacer una migración limpia de:
+Puedes hacer una migración limpia de:
 
 ```text
 questboard → lifequest

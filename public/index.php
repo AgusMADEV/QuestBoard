@@ -14,6 +14,7 @@ if (isset($_SESSION['user_id'])) {
     <title><?= APP_NAME ?> | Convierte tus metas en resultados</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/modules/auth.css">
 </head>
 <body>
     <main class="landing">

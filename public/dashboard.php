@@ -6,6 +6,8 @@ require_once __DIR__ . '/../app/Models/LifeArea.php';
 require_once __DIR__ . '/../app/Models/Goal.php';
 require_once __DIR__ . '/../app/Models/Project.php';
 require_once __DIR__ . '/../app/Models/Task.php';
+require_once __DIR__ . '/../app/Models/AreaProgression.php';
+require_once __DIR__ . '/../app/Support/StreakWeek.php';
 
 AuthController::requireAuth();
 
@@ -29,15 +31,30 @@ $activeProjects = $projectModel->getActiveByUser((int) $user['id'], 4);
 
 $taskModel = new Task();
 $todayTasks = $taskModel->getTodayByUser((int) $user['id'], 4);
+$weekActivity = buildWeeklyActivityByUser((int) $user['id']);
 
 $xpCurrent = (int) $user['xp'];
-$xpNext = 2000;
-$xpPercent = min(100, (int) (($xpCurrent / max(1, $xpNext)) * 100));
-
 $level = max(1, (int) $user['level']);
+$xpPerLevel = 1000;
+$xpFloor = ($level - 1) * $xpPerLevel;
+$xpCurrentLevel = max(0, $xpCurrent - $xpFloor);
+$xpPercent = min(100, (int) (($xpCurrentLevel / max(1, $xpPerLevel)) * 100));
+$xpNext = $level * $xpPerLevel;
 $points = (int) $user['points'];
 $gems = max(0, intdiv($points, 20));
 $currentStreak = (int) $user['current_streak'];
+$hpSystemEnabled = defined('FEATURE_HP_SYSTEM') ? (bool) FEATURE_HP_SYSTEM : false;
+$baseHp = defined('PLAYER_BASE_HP') ? (int) PLAYER_BASE_HP : 1000;
+$maxHp = max(1, (int) ($user['max_hp'] ?? $baseHp));
+$hp = max(0, min($maxHp, (int) ($user['hp'] ?? $maxHp)));
+$hpPercent = (int) round(($hp / max(1, $maxHp)) * 100);
+$areaProgressionEnabled = defined('FEATURE_AREA_PROGRESSION') ? (bool) FEATURE_AREA_PROGRESSION : false;
+$areaLevels = [];
+
+if ($areaProgressionEnabled) {
+    $areaProgressionModel = new AreaProgression();
+    $areaLevels = $areaProgressionModel->getTopByUser((int) $user['id'], 4);
+}
 
 $dailyCompleted = count(array_filter($todayTasks, static fn($task) => ($task['status'] ?? '') === 'completed'));
 $dailyTotal = max(4, count($todayTasks));
@@ -76,37 +93,25 @@ function shortText(string|null $value, int $limit = 42): string
     <title>Inicio | <?= APP_NAME ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../assets/css/styles.css">
+    <link rel="stylesheet" href="../assets/css/modules/dashboard.css">
 </head>
 <body class="lifequest-app">
     <aside class="lq-sidebar">
-        <a href="dashboard.php" class="lq-logo">
-            <span>Life<span>Quest</span><i>✦</i></span>
-        </a>
-
-        <nav class="lq-nav">
-            <a href="dashboard.php" class="active"><span>🏠</span>Inicio</a>
-            <a href="goals.php"><span>🎯</span>Metas</a>
-            <a href="projects.php"><span>🚀</span>Retos</a>
-            <a href="tasks.php"><span>✅</span>Misiones</a>
-            <a href="areas.php"><span>🧩</span>Áreas</a>
-            <a href="#"><span>💚</span>Hábitos</a>
-            <a href="#"><span>🛍️</span>Tienda</a>
-            <a href="#"><span>📊</span>Progreso</a>
-        </nav>
+        <?php $activeNav = 'dashboard'; ?>
+        <?php require __DIR__ . '/partials/sidebar_nav.php'; ?>
 
         <section class="lq-sidebar-card streak">
             <div class="streak-icon">🔥</div>
             <p>Racha actual</p>
             <strong><?= $currentStreak ?> días</strong>
             <small>¡Sigue así!</small>
-            <div class="week-dots">
-                <span class="done">L</span>
-                <span class="done">M</span>
-                <span class="done">X</span>
-                <span class="done">J</span>
-                <span class="done">V</span>
-                <span>S</span>
-                <span>D</span>
+            <div class="week-dots week-stack">
+                <?php foreach ($weekActivity as $day): ?>
+                    <div class="week-day" title="<?= e($day['date']) ?>">
+                        <span class="week-dot <?= $day['done'] ? 'done' : '' ?>"><?= $day['done'] ? '✓' : '' ?></span>
+                        <small class="week-label"><?= $day['label'] ?></small>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </section>
 
@@ -114,63 +119,19 @@ function shortText(string|null $value, int $limit = 42): string
             <div>
                 <strong>¡Desbloquea más!</strong>
                 <p>Completa misiones y consigue recompensas exclusivas.</p>
-                <a href="#" class="mini-btn">Ver tienda</a>
+                <a href="shop.php" class="mini-btn">Ver tienda</a>
             </div>
             <span class="bag">🎒</span>
         </section>
 
-        <section class="lq-user-mini">
-            <div class="mini-avatar"><?= mb_strtoupper(mb_substr($user['name'], 0, 1)) ?></div>
-            <div>
-                <strong><?= e(shortText($user['name'], 18)) ?></strong>
-                <small>Ver perfil</small>
-            </div>
-            <span>⌄</span>
-        </section>
-
-        <div class="lq-sidebar-bottom">
-            <a href="#">⚙️</a>
-            <a href="#">?</a>
-            <a href="logout.php">↪</a>
-        </div>
+        <?php require __DIR__ . '/partials/sidebar_user_mini.php'; ?>
+        <?php require __DIR__ . '/partials/sidebar_bottom.php'; ?>
     </aside>
 
     <main class="lq-main">
-        <header class="lq-topbar">
-            <button class="icon-btn">☰</button>
-
-            <div class="search-box">
-                <span>🔎</span>
-                <input type="search" placeholder="Buscar misiones, hábitos o recompensas..." disabled>
-                <kbd>⌘ K</kbd>
-            </div>
-
-            <div class="top-stats">
-                <div class="xp-pill">
-                    <span>✦</span>
-                    <strong><?= number_format($xpCurrent, 0, ',', '.') ?> XP</strong>
-                    <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
-                    <small>Nivel <?= $level ?></small>
-                </div>
-
-                <div class="currency-pill coin">
-                    <span>🪙</span>
-                    <strong><?= number_format($points, 0, ',', '.') ?></strong>
-                </div>
-
-                <div class="currency-pill gem">
-                    <span>💎</span>
-                    <strong><?= $gems ?></strong>
-                </div>
-
-                <button class="icon-btn">🔔</button>
-
-                <div class="profile-pill">
-                    <div class="mini-avatar image-like"><?= mb_strtoupper(mb_substr($user['name'], 0, 1)) ?></div>
-                    <strong>¡Hola, <?= e(shortText($user['name'], 12)) ?>! 👋</strong>
-                </div>
-            </div>
-        </header>
+        <?php $topbarSearchPlaceholder = 'Buscar misiones, hábitos o recompensas...'; ?>
+        <?php $topbarShowHp = $hpSystemEnabled; ?>
+        <?php require __DIR__ . '/partials/topbar.php'; ?>
 
         <div class="lq-dashboard-grid">
             <section class="lq-center">
@@ -194,13 +155,13 @@ function shortText(string|null $value, int $limit = 42): string
                                 <strong><?= $level ?></strong>
                                 <span>Camino a nivel <?= $level + 1 ?></span>
                                 <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
-                                <em><?= number_format($xpCurrent, 0, ',', '.') ?> / <?= number_format($xpNext, 0, ',', '.') ?> XP</em>
+                                <em><?= number_format($xpCurrentLevel, 0, ',', '.') ?> / <?= number_format($xpPerLevel, 0, ',', '.') ?> XP</em>
                             </article>
 
                             <article>
                                 <small>XP actual</small>
                                 <strong><?= number_format($xpCurrent, 0, ',', '.') ?></strong>
-                                <span>+200 XP para subir</span>
+                                <span><?= number_format(max(0, $xpNext - $xpCurrent), 0, ',', '.') ?> XP para subir</span>
                                 <div class="mini-progress"><i style="width: <?= $xpPercent ?>%"></i></div>
                             </article>
 
@@ -215,6 +176,15 @@ function shortText(string|null $value, int $limit = 42): string
                                 <strong><?= $gems ?></strong>
                                 <span>Para objetos únicos</span>
                             </article>
+
+                            <?php if ($hpSystemEnabled): ?>
+                                <article>
+                                    <small>Vida</small>
+                                    <strong><?= number_format($hp, 0, ',', '.') ?></strong>
+                                    <span><?= number_format($maxHp, 0, ',', '.') ?> HP máximos</span>
+                                    <div class="mini-progress"><i style="width: <?= $hpPercent ?>%"></i></div>
+                                </article>
+                            <?php endif; ?>
                         </div>
 
                         <div class="hero-bottom">
@@ -224,8 +194,13 @@ function shortText(string|null $value, int $limit = 42): string
                                     <small>Racha actual</small>
                                     <strong><?= $currentStreak ?> días</strong>
                                 </div>
-                                <div class="week-mini">
-                                    <i class="done">L</i><i class="done">M</i><i class="done">X</i><i class="done">J</i><i class="done">V</i><i>S</i><i>D</i>
+                                <div class="week-mini week-stack">
+                                    <?php foreach ($weekActivity as $day): ?>
+                                        <div class="week-day" title="<?= e($day['date']) ?>">
+                                            <span class="week-dot <?= $day['done'] ? 'done' : '' ?>"><?= $day['done'] ? '✓' : '' ?></span>
+                                            <small class="week-label"><?= $day['label'] ?></small>
+                                        </div>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
@@ -240,14 +215,14 @@ function shortText(string|null $value, int $limit = 42): string
                 <section class="lq-card missions-card">
                     <div class="lq-card-header">
                         <h2>Misiones de hoy <span><?= count($todayTasks) ?></span></h2>
-                        <a href="tasks.php">Ver todas</a>
+                        <a href="goals.php?section=tasks">Ver todas</a>
                     </div>
 
                     <?php if (empty($todayTasks)): ?>
                         <div class="friendly-empty">
                             <strong>No hay misiones para hoy todavía.</strong>
                             <p>Crea tareas concretas para avanzar en tus retos y metas.</p>
-                            <a href="tasks.php" class="mini-btn">Crear misión</a>
+                            <a href="goals.php?section=tasks" class="mini-btn">Crear misión</a>
                         </div>
                     <?php else: ?>
                         <div class="mission-list">
@@ -383,10 +358,36 @@ function shortText(string|null $value, int $limit = 42): string
                     <a href="goals.php" class="center-link">Ver calendario</a>
                 </section>
 
+                <?php if ($areaProgressionEnabled): ?>
+                    <section class="lq-card area-levels-card">
+                        <div class="lq-card-header">
+                            <h2>Nivel por áreas</h2>
+                            <a href="areas.php">Ver áreas</a>
+                        </div>
+
+                        <?php if (empty($areaLevels)): ?>
+                            <p class="muted">Completa hábitos o misiones con área para empezar a subir nivel por áreas.</p>
+                        <?php else: ?>
+                            <div class="area-levels-list">
+                                <?php foreach ($areaLevels as $areaLevel): ?>
+                                    <article class="area-level-item">
+                                        <span class="area-level-icon"><?= e($areaLevel['icon']) ?></span>
+                                        <div>
+                                            <strong><?= e(shortText($areaLevel['name'], 20)) ?> · Lv <?= (int) $areaLevel['level'] ?></strong>
+                                            <div class="mini-progress"><i style="width: <?= (int) $areaLevel['level_percent'] ?>%"></i></div>
+                                            <small><?= number_format((int) $areaLevel['level_xp'], 0, ',', '.') ?> / <?= number_format((int) $areaLevel['level_xp_target'], 0, ',', '.') ?> XP</small>
+                                        </div>
+                                    </article>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+                <?php endif; ?>
+
                 <section class="lq-card shop-card">
                     <div class="lq-card-header">
                         <h2>Tienda destacada</h2>
-                        <a href="#">Ver todo</a>
+                        <a href="shop.php">Ver todo</a>
                     </div>
                     <div class="shop-grid">
                         <article class="shop-item neon">

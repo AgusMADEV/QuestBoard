@@ -73,14 +73,16 @@ final class ProjectController
         if ($title === '') {
             return [
                 'success' => false,
-                'message' => 'El título del proyecto es obligatorio.'
+                'message' => 'El título del proyecto es obligatorio.',
+                'errors' => ['title' => 'El título es obligatorio.'],
             ];
         }
 
         if (mb_strlen($title) > 150) {
             return [
                 'success' => false,
-                'message' => 'El título no puede superar los 150 caracteres.'
+                'message' => 'El título no puede superar los 150 caracteres.',
+                'errors' => ['title' => 'Máximo 150 caracteres.'],
             ];
         }
 
@@ -94,7 +96,8 @@ final class ProjectController
             if (!$goalModel->findByIdAndUser($goalId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'La meta seleccionada no existe o no pertenece a tu usuario.'
+                    'message' => 'La meta seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['goal_id' => 'Meta no válida para tu usuario.'],
                 ];
             }
         }
@@ -106,7 +109,8 @@ final class ProjectController
             if (!$lifeAreaModel->findByIdAndUser($areaId, $userId)) {
                 return [
                     'success' => false,
-                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.'
+                    'message' => 'El área seleccionada no existe o no pertenece a tu usuario.',
+                    'errors' => ['area_id' => 'Área no válida para tu usuario.'],
                 ];
             }
         }

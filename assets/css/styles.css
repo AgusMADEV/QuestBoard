@@ -569,7 +569,7 @@ a {
     align-items: center;
     margin-bottom: 26px;
     border-bottom: 1px solid rgba(231, 237, 247, 0.6);
-    padding: 15px;
+    padding: 15px 30px;
 }
 
 .topbar-left {
@@ -672,9 +672,8 @@ a {
     align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
-    gap: 10px;
+    gap: 20px;
 }
-
 .profile-greeting strong {
     white-space: nowrap;
 }

@@ -6,6 +6,8 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) 360px;
     gap: 28px;
+    padding: 0px 30px;
+    padding-bottom: 50px;
 }
 
 
